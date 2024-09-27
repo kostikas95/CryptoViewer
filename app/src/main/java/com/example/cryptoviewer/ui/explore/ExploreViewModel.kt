@@ -27,13 +27,16 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
     val cryptos: LiveData<List<CryptoCurrency>> = _cryptos
 
     // maybe this will not be needed as live data
+    // may be needed to flip the arrow which indicates ascending / descending order
     private val _order = MutableLiveData<Pair<SortField, SortOrder>> (
         Pair(SortField.MARKET_CAP_RANK, SortOrder.ASCENDING)
     )
     // val order: LiveData<Pair<SortField, SortOrder>> = _order
 
-    private var batchesFetched: Int = 0   // fetched from api in 100s
-    private var batchesProjected: Int = 0 // fetched from db  in 50s
+    private var batchesFetched: Int = 0
+    private var perApiCall: Int = 100
+    private var batchesProjected: Int = 0
+    private var perDbQuery = 50
 
     init {
         fetchAllCryptoFromApi()
@@ -47,12 +50,12 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
                     val batch = cryptoApi.fetchCryptos(
                         vsCurrency = ApiVsCurrency.USD,
                         page = batchesFetched + 1,
-                        perPage = 100)
+                        perPage = perApiCall)
                     if (batch.isEmpty()) break
                     Log.d("fetchAllCryptoFromApi", "first crypto in fetched batch: ${batch.first().id}")
                     cryptoDao.insertCryptos(batch)
                     if (batchesProjected == 0) {
-                        val fromDb : List<CryptoCurrency> = cryptoDao.getCryptosByMarketCapRankAsc(limit = 50, offset = batchesProjected * 50)
+                        val fromDb : List<CryptoCurrency> = cryptoDao.getCryptosByMarketCapRankAsc(limit = perDbQuery, offset = 0)
                         batchesProjected++
                         Log.d("fetchAllCryptoFromApi", "first crypto from db: ${batch.first().id}")
                         _cryptos.postValue(fromDb)
@@ -87,9 +90,15 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
         loadNextPage()
     }
 
+    fun reload() {
+        batchesProjected = 0
+        _cryptos.value = emptyList()
+        loadNextPage()
+    }
+
     fun loadNextPage() {
         viewModelScope.launch {
-            val nextBatch: List<CryptoCurrency> = fetchNextBatchFromDb(limit = 50, offset = batchesProjected * 50)
+            val nextBatch: List<CryptoCurrency> = fetchNextBatchFromDb()
             batchesProjected++
             Log.d("loadNextPage", "${nextBatch.size} cryptos fetched from db")
             val currentList = _cryptos.value ?: emptyList()
@@ -100,29 +109,30 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    private suspend fun fetchNextBatchFromDb(limit: Int, offset: Int) : List<CryptoCurrency> {
+    private suspend fun fetchNextBatchFromDb() : List<CryptoCurrency> {
         val currentOrder = _order.value
+
         var nextBatch: List<CryptoCurrency> = emptyList()
         if (currentOrder?.first == SortField.MARKET_CAP_RANK && currentOrder.second == SortOrder.ASCENDING) {
-            nextBatch = cryptoDao.getCryptosByMarketCapRankAsc(limit, offset)
+            nextBatch = cryptoDao.getCryptosByMarketCapRankAsc(perDbQuery, batchesProjected * perDbQuery)
         } else if (currentOrder?.first == SortField.MARKET_CAP_RANK && currentOrder.second == SortOrder.DESCENDING) {
-            nextBatch = cryptoDao.getCryptosByMarketCapRankDsc(limit, offset)
+            nextBatch = cryptoDao.getCryptosByMarketCapRankDsc(perDbQuery, batchesProjected * perDbQuery)
         } else if (currentOrder?.first == SortField.NAME && currentOrder.second == SortOrder.ASCENDING) {
-            nextBatch = cryptoDao.getCryptosByNameAsc(limit, offset)
+            nextBatch = cryptoDao.getCryptosByNameAsc(perDbQuery, batchesProjected * perDbQuery)
         } else if (currentOrder?.first == SortField.NAME && currentOrder.second == SortOrder.DESCENDING) {
-            nextBatch = cryptoDao.getCryptosByNameDsc(limit, offset)
+            nextBatch = cryptoDao.getCryptosByNameDsc(perDbQuery, batchesProjected * perDbQuery)
         } else if (currentOrder?.first == SortField.CURRENT_PRICE && currentOrder.second == SortOrder.ASCENDING) {
-            nextBatch = cryptoDao.getCryptosByCurrentPriceAsc(limit, offset)
+            nextBatch = cryptoDao.getCryptosByCurrentPriceAsc(perDbQuery, batchesProjected * perDbQuery)
         } else if (currentOrder?.first == SortField.CURRENT_PRICE && currentOrder.second == SortOrder.DESCENDING) {
-            nextBatch = cryptoDao.getCryptosByCurrentPriceDsc(limit, offset)
+            nextBatch = cryptoDao.getCryptosByCurrentPriceDsc(perDbQuery, batchesProjected * perDbQuery)
         } else if (currentOrder?.first == SortField.PRICE_CHANGE && currentOrder.second == SortOrder.ASCENDING) {
-            nextBatch = cryptoDao.getCryptosByPriceChangePercentageAsc(limit, offset)
+            nextBatch = cryptoDao.getCryptosByPriceChangePercentageAsc(perDbQuery, batchesProjected * perDbQuery)
         } else if (currentOrder?.first == SortField.PRICE_CHANGE && currentOrder.second == SortOrder.DESCENDING) {
-            nextBatch = cryptoDao.getCryptosByPriceChangePercentageDsc(limit, offset)
+            nextBatch = cryptoDao.getCryptosByPriceChangePercentageDsc(perDbQuery, batchesProjected * perDbQuery)
         } else if (currentOrder?.first == SortField.MARKET_CAP && currentOrder.second == SortOrder.ASCENDING) {
-            nextBatch = cryptoDao.getCryptosByMarketCapAsc(limit, offset)
+            nextBatch = cryptoDao.getCryptosByMarketCapAsc(perDbQuery, batchesProjected * perDbQuery)
         } else if (currentOrder?.first == SortField.MARKET_CAP && currentOrder.second == SortOrder.DESCENDING) {
-            nextBatch = cryptoDao.getCryptosByMarketCapDsc(limit, offset)
+            nextBatch = cryptoDao.getCryptosByMarketCapDsc(perDbQuery, batchesProjected * perDbQuery)
         }
         return nextBatch
     }

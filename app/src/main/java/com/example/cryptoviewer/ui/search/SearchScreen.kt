@@ -1,14 +1,12 @@
-package com.example.cryptoviewer.ui.explore
+package com.example.cryptoviewer.ui.search
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,11 +18,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,49 +30,43 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cryptoviewer.R
 import com.example.cryptoviewer.database.SortField
-import com.example.cryptoviewer.formatNumberForDisplay
 import com.example.cryptoviewer.model.CryptoCurrency
 import com.example.cryptoviewer.ui.reusables.ListItem
-import kotlinx.coroutines.flow.filter
-import java.util.Locale
 
 @Composable
-fun ExploreScreen() {
+fun SearchScreen() {
     // view model
-    val viewModel : ExploreViewModel = viewModel()
+    val viewModel : SearchViewModel = viewModel()
 
     // states and data
     val cryptos by viewModel.cryptos.observeAsState(emptyList())
     val lazyListState = rememberLazyListState(0)
-    // val order by viewModel.order.observeAsState(Pair(SortField.MARKET_CAP_RANK, SortOrder.ASCENDING))
+    val searchText by viewModel.searchText
 
     // lambdas
     val onSortingFactorTextClick : (SortField) -> Unit = { newField ->
         viewModel.changeOrder(newField)
     }
-
-    LaunchedEffect(lazyListState) {
-        snapshotFlow { lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-            .filter { it == lazyListState.layoutInfo.totalItemsCount - 1 }
-            .collect {
-                viewModel.loadNextPage()
-            }
+    val onSearchTextChanged : (String) -> Unit = { newText ->
+        viewModel.updateSearchText(newText)
     }
+
     Scaffold(
-        topBar = { TopBar("Explore") },
+        topBar = { TopBar("Search") },
         bottomBar = { BottomBar() },
-        floatingActionButton = { AutoScrollToTopButton() },
         content = { innerPadding ->
-            Content(innerPadding,
+            Content(
+                innerPadding,
+                searchText,
                 cryptos,
                 lazyListState,
-                onSortingFactorTextClick
+                onSortingFactorTextClick,
+                onSearchTextChanged
             )
         }
     )
@@ -139,24 +130,26 @@ fun BottomBar(/* pass active window to make it reusable */) {
 }
 
 @Composable
-fun AutoScrollToTopButton() {
-
-}
-
-// pass cryptos here
-@Composable
 fun Content(
     innerPadding: PaddingValues,
+    searchText: String,
     cryptos: List<CryptoCurrency>,
     lazyListState: LazyListState,
-    onSortingFactorTextClick: (SortField) -> Unit
-    // onLoadMore : suspend () -> Unit
+    onSortingFactorTextClick: (SortField) -> Unit,
+    onSearchTextChanged: (String) -> Unit
 ) {
-
     Column(
         modifier = Modifier.fillMaxSize()
             .padding(innerPadding)
     ) {
+        TextField(
+            value = searchText,
+            onValueChange = { newText ->
+                onSearchTextChanged(newText)
+            },
+            label = { Text("Search name or id") }
+        )
+
         Row(
             modifier = Modifier.fillMaxWidth(1f)
                 .background((Color.Yellow)),
@@ -175,7 +168,7 @@ fun Content(
             Text(
                 modifier = Modifier.weight(1f)
                     .clickable {
-                    onSortingFactorTextClick(SortField.MARKET_CAP_RANK)
+                        onSortingFactorTextClick(SortField.MARKET_CAP_RANK)
                     },
                 text = "#",
                 fontSize = 16.sp,
@@ -251,14 +244,6 @@ fun Content(
                 ListItem(crypto)
             }
         }
+
     }
-}
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun Preview() {
-    ExploreScreen()
-
 }
