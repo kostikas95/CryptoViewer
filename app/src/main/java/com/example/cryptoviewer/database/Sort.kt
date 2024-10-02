@@ -2,7 +2,7 @@ package com.example.cryptoviewer.database
 
 enum class SortField(val field: String) {
     MARKET_CAP_RANK("marketCapRank"),
-    NAME("name"),
+    SYMBOL("symbol"),
     CURRENT_PRICE("currentPrice"),
     PRICE_CHANGE("priceChangePercentage24h"),
     MARKET_CAP("marketCap")

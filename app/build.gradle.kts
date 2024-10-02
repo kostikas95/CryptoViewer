@@ -69,9 +69,6 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.lifecycle.livedata.compose)
-    // implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
-    // implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.5")
-    // implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.5")
 
     // gson for json parsing
     // implementation("com.google.code.gson:gson:2.8.9")
@@ -82,12 +79,17 @@ dependencies {
 
 
     // room
-    // val room_version = "2.6.1"
-    // implementation("androidx.room:room-runtime:$room_version")
     implementation(libs.androidx.room.runtime)
     kapt(libs.androidx.room.compiler)
     // ksp(libs.androidx.room.compiler) // for annotation processing // ksp or kapt?
     implementation(libs.androidx.room.ktx) // Kotlin Extensions and Coroutines support for Room
+
+    // navigation
+    implementation(libs.androidx.navigation.compose)
+
+    // coil for svgs
+    implementation(libs.coil.compose)
+    implementation(libs.coil.svg)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

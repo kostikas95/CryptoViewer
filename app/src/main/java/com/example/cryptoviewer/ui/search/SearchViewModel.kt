@@ -60,7 +60,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         else if (currentOrder.first == newField)
             _order.postValue(Pair(currentOrder.first, currentOrder.second.toggle()))
 
-        else if (newField == SortField.MARKET_CAP_RANK || newField == SortField.NAME)
+        else if (newField == SortField.MARKET_CAP_RANK || newField == SortField.SYMBOL)
             _order.postValue(Pair(newField, SortOrder.ASCENDING))
         else _order.postValue(Pair(newField, SortOrder.DESCENDING))
 
@@ -96,19 +96,23 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
             nextBatch = cryptoDao.getCryptosLikeByMarketCapRankAsc(limit, offset, text)
         } else if (currentOrder?.first == SortField.MARKET_CAP_RANK && currentOrder.second == SortOrder.DESCENDING) {
             nextBatch = cryptoDao.getCryptosLikeByMarketCapRankDsc(limit, offset, text)
-        } else if (currentOrder?.first == SortField.NAME && currentOrder.second == SortOrder.ASCENDING) {
-            nextBatch = cryptoDao.getCryptosLikeByNameAsc(limit, offset, text)
-        } else if (currentOrder?.first == SortField.NAME && currentOrder.second == SortOrder.DESCENDING) {
-            nextBatch = cryptoDao.getCryptosLikeByNameDsc(limit, offset, text)
-        } else if (currentOrder?.first == SortField.CURRENT_PRICE && currentOrder.second == SortOrder.ASCENDING) {
+        }
+        else if (currentOrder?.first == SortField.SYMBOL && currentOrder.second == SortOrder.ASCENDING) {
+            nextBatch = cryptoDao.getCryptosLikeBySymbolAsc(limit, offset, text)
+        } else if (currentOrder?.first == SortField.SYMBOL && currentOrder.second == SortOrder.DESCENDING) {
+            nextBatch = cryptoDao.getCryptosLikeBySymbolDsc(limit, offset, text)
+        }
+        else if (currentOrder?.first == SortField.CURRENT_PRICE && currentOrder.second == SortOrder.ASCENDING) {
             nextBatch = cryptoDao.getCryptosLikeByCurrentPriceAsc(limit, offset, text)
         } else if (currentOrder?.first == SortField.CURRENT_PRICE && currentOrder.second == SortOrder.DESCENDING) {
             nextBatch = cryptoDao.getCryptosLikeByCurrentPriceDsc(limit, offset, text)
-        } else if (currentOrder?.first == SortField.PRICE_CHANGE && currentOrder.second == SortOrder.ASCENDING) {
+        }
+        else if (currentOrder?.first == SortField.PRICE_CHANGE && currentOrder.second == SortOrder.ASCENDING) {
             nextBatch = cryptoDao.getCryptosLikeByPriceChangePercentageAsc(limit, offset, text)
         } else if (currentOrder?.first == SortField.PRICE_CHANGE && currentOrder.second == SortOrder.DESCENDING) {
             nextBatch = cryptoDao.getCryptosLikeByPriceChangePercentageDsc(limit, offset, text)
-        } else if (currentOrder?.first == SortField.MARKET_CAP && currentOrder.second == SortOrder.ASCENDING) {
+        }
+        else if (currentOrder?.first == SortField.MARKET_CAP && currentOrder.second == SortOrder.ASCENDING) {
             nextBatch = cryptoDao.getCryptosLikeByMarketCapAsc(limit, offset, text)
         } else if (currentOrder?.first == SortField.MARKET_CAP && currentOrder.second == SortOrder.DESCENDING) {
             nextBatch = cryptoDao.getCryptosLikeByMarketCapDsc(limit, offset, text)

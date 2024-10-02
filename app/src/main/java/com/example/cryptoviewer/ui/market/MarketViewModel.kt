@@ -1,4 +1,4 @@
-package com.example.cryptoviewer.ui.explore
+package com.example.cryptoviewer.ui.market
 
 import android.app.Application
 import android.util.Log
@@ -17,7 +17,7 @@ import com.example.cryptoviewer.network.RetrofitInstance
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class ExploreViewModel(application: Application) : AndroidViewModel(application) {
+class MarketViewModel(application: Application) : AndroidViewModel(application) {
 
     private val cryptoDao: CryptoCurrencyDao = CryptoDatabase.getDatabase(application).cryptoDao()
     private val cryptoApi: CryptoApiService = RetrofitInstance.api
@@ -79,7 +79,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
         else if (currentOrder.first == newField)
             _order.postValue(Pair(currentOrder.first, currentOrder.second.toggle()))
 
-        else if (newField == SortField.MARKET_CAP_RANK || newField == SortField.NAME)
+        else if (newField == SortField.MARKET_CAP_RANK || newField == SortField.SYMBOL)
             _order.postValue(Pair(newField, SortOrder.ASCENDING))
         else _order.postValue(Pair(newField, SortOrder.DESCENDING))
 
@@ -117,19 +117,23 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
             nextBatch = cryptoDao.getCryptosByMarketCapRankAsc(perDbQuery, batchesProjected * perDbQuery)
         } else if (currentOrder?.first == SortField.MARKET_CAP_RANK && currentOrder.second == SortOrder.DESCENDING) {
             nextBatch = cryptoDao.getCryptosByMarketCapRankDsc(perDbQuery, batchesProjected * perDbQuery)
-        } else if (currentOrder?.first == SortField.NAME && currentOrder.second == SortOrder.ASCENDING) {
-            nextBatch = cryptoDao.getCryptosByNameAsc(perDbQuery, batchesProjected * perDbQuery)
-        } else if (currentOrder?.first == SortField.NAME && currentOrder.second == SortOrder.DESCENDING) {
-            nextBatch = cryptoDao.getCryptosByNameDsc(perDbQuery, batchesProjected * perDbQuery)
-        } else if (currentOrder?.first == SortField.CURRENT_PRICE && currentOrder.second == SortOrder.ASCENDING) {
+        }
+        else if (currentOrder?.first == SortField.SYMBOL && currentOrder.second == SortOrder.ASCENDING) {
+            nextBatch = cryptoDao.getCryptosBySymbolAsc(perDbQuery, batchesProjected * perDbQuery)
+        } else if (currentOrder?.first == SortField.SYMBOL && currentOrder.second == SortOrder.DESCENDING) {
+            nextBatch = cryptoDao.getCryptosBySymbolDsc(perDbQuery, batchesProjected * perDbQuery)
+        }
+        else if (currentOrder?.first == SortField.CURRENT_PRICE && currentOrder.second == SortOrder.ASCENDING) {
             nextBatch = cryptoDao.getCryptosByCurrentPriceAsc(perDbQuery, batchesProjected * perDbQuery)
         } else if (currentOrder?.first == SortField.CURRENT_PRICE && currentOrder.second == SortOrder.DESCENDING) {
             nextBatch = cryptoDao.getCryptosByCurrentPriceDsc(perDbQuery, batchesProjected * perDbQuery)
-        } else if (currentOrder?.first == SortField.PRICE_CHANGE && currentOrder.second == SortOrder.ASCENDING) {
+        }
+        else if (currentOrder?.first == SortField.PRICE_CHANGE && currentOrder.second == SortOrder.ASCENDING) {
             nextBatch = cryptoDao.getCryptosByPriceChangePercentageAsc(perDbQuery, batchesProjected * perDbQuery)
         } else if (currentOrder?.first == SortField.PRICE_CHANGE && currentOrder.second == SortOrder.DESCENDING) {
             nextBatch = cryptoDao.getCryptosByPriceChangePercentageDsc(perDbQuery, batchesProjected * perDbQuery)
-        } else if (currentOrder?.first == SortField.MARKET_CAP && currentOrder.second == SortOrder.ASCENDING) {
+        }
+        else if (currentOrder?.first == SortField.MARKET_CAP && currentOrder.second == SortOrder.ASCENDING) {
             nextBatch = cryptoDao.getCryptosByMarketCapAsc(perDbQuery, batchesProjected * perDbQuery)
         } else if (currentOrder?.first == SortField.MARKET_CAP && currentOrder.second == SortOrder.DESCENDING) {
             nextBatch = cryptoDao.getCryptosByMarketCapDsc(perDbQuery, batchesProjected * perDbQuery)

@@ -1,14 +1,12 @@
-package com.example.cryptoviewer.ui.explore
+package com.example.cryptoviewer.ui.market
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -37,18 +35,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.cryptoviewer.R
 import com.example.cryptoviewer.database.SortField
-import com.example.cryptoviewer.formatNumberForDisplay
 import com.example.cryptoviewer.model.CryptoCurrency
+import com.example.cryptoviewer.navigation.Market
+import com.example.cryptoviewer.navigation.Search
+import com.example.cryptoviewer.ui.reusables.BottomBar
 import com.example.cryptoviewer.ui.reusables.ListItem
 import kotlinx.coroutines.flow.filter
-import java.util.Locale
 
 @Composable
-fun ExploreScreen() {
+fun MarketScreen(navController: NavHostController) {
     // view model
-    val viewModel : ExploreViewModel = viewModel()
+    val viewModel : MarketViewModel = viewModel()
 
     // states and data
     val cryptos by viewModel.cryptos.observeAsState(emptyList())
@@ -69,7 +69,7 @@ fun ExploreScreen() {
     }
     Scaffold(
         topBar = { TopBar("Explore") },
-        bottomBar = { BottomBar() },
+        bottomBar = { BottomBar(navController) },
         floatingActionButton = { AutoScrollToTopButton() },
         content = { innerPadding ->
             Content(innerPadding,
@@ -105,36 +105,6 @@ fun TopBar(
                 contentDescription = "topAppBarImage"
             )
         }
-    }
-}
-
-@Composable
-fun BottomBar(/* pass active window to make it reusable */) {
-    Row(
-        modifier = Modifier.fillMaxWidth(1f)
-            .height(60.dp)
-            .background(Color.White),
-        horizontalArrangement = Arrangement.SpaceAround,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Image(
-            painterResource(R.drawable.chart_line),
-            contentDescription = "explore image",
-            modifier = Modifier.size(32.dp, 32.dp),
-            contentScale = ContentScale.Fit
-        )
-        Image(
-            painterResource(R.drawable.search),
-            contentDescription = "search image",
-            modifier = Modifier.size(32.dp, 32.dp),
-            contentScale = ContentScale.Fit
-        )
-        Image(
-            painterResource(R.drawable.heart),
-            contentDescription = "favourites image",
-            modifier = Modifier.size(32.dp, 32.dp),
-            contentScale = ContentScale.Fit
-        )
     }
 }
 
@@ -188,9 +158,9 @@ fun Content(
             Text(
                 modifier = Modifier.weight(1f)
                     .clickable {
-                        onSortingFactorTextClick(SortField.NAME)
+                        onSortingFactorTextClick(SortField.SYMBOL)
                     },
-                text = "name",
+                text = "COIN",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Thin,
                 maxLines = 2,
@@ -203,7 +173,7 @@ fun Content(
                     .clickable {
                         onSortingFactorTextClick(SortField.CURRENT_PRICE)
                     },
-                text = "current\nprice",
+                text = "CURRENT\nPRICE",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Thin,
                 maxLines = 2,
@@ -217,7 +187,7 @@ fun Content(
                     .clickable {
                         onSortingFactorTextClick(SortField.PRICE_CHANGE)
                     },
-                text = "price\nchange(%)",
+                text = "PRICE\nCHANGE(%)",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Thin,
                 maxLines = 2,
@@ -231,7 +201,7 @@ fun Content(
                     .clickable {
                         onSortingFactorTextClick(SortField.MARKET_CAP)
                     },
-                text = "market\ncap",
+                text = "MARKET\nCAP",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Thin,
                 maxLines = 2,
@@ -252,13 +222,4 @@ fun Content(
             }
         }
     }
-}
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun Preview() {
-    ExploreScreen()
-
 }

@@ -4,8 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.example.cryptoviewer.ui.explore.ExploreScreen
-import com.example.cryptoviewer.ui.search.SearchScreen
+import com.example.cryptoviewer.navigation.Navigation
+import com.example.cryptoviewer.ui.market.MarketScreen
 import com.example.cryptoviewer.ui.theme.CryptoViewerTheme
 
 
@@ -16,14 +16,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CryptoViewerTheme {
-                SearchScreen()
+                Navigation()
             }
         }
-
-
     }
-
-
 }
 
 
