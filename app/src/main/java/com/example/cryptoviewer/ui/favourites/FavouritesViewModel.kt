@@ -1,8 +1,6 @@
 package com.example.cryptoviewer.ui.favourites
 
-import android.annotation.SuppressLint
 import android.app.Application
-import android.content.Context
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -41,8 +39,14 @@ class FavouritesViewModel(application: Application) : AndroidViewModel(applicati
 
     private var batchJob: Job? = null
 
+    fun debug() {
+        Log.d("ViewModel", "navigated back to FavouritesScreen")
+        Log.d("ViewModel", "_cryptos: ${_cryptos.value?.size} cryptos.")
+        Log.d("ViewModel", "order by ${_order.value?.first} ${_order.value?.second}")
+    }
 
     init {
+        Log.d("ViewModel", "ViewModel initialized")
         viewModelScope.launch {
             PreferencesDataStore.getFavoriteIds(appContext).collect { favourites ->
                 _cryptos.postValue(fetchFavouritesFromDb(favourites.toList()))

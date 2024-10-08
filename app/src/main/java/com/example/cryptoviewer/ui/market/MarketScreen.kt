@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +40,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.cryptoviewer.R
@@ -46,15 +48,19 @@ import com.example.cryptoviewer.database.SortField
 import com.example.cryptoviewer.model.CryptoCurrency
 import com.example.cryptoviewer.navigation.Market
 import com.example.cryptoviewer.navigation.Search
+import com.example.cryptoviewer.ui.favourites.FavouritesViewModel
 import com.example.cryptoviewer.ui.reusables.BottomBar
 import com.example.cryptoviewer.ui.reusables.ListItem
 import com.example.cryptoviewer.ui.reusables.ScrollListHeadline
 import kotlinx.coroutines.flow.filter
 
 @Composable
-fun MarketScreen(navController: NavHostController) {
-    // view model
-    val viewModel : MarketViewModel = viewModel()
+fun MarketScreen(
+    navController: NavHostController,
+    viewModelStoreOwner: ViewModelStoreOwner
+) {
+    val viewModel: MarketViewModel = viewModel(viewModelStoreOwner)
+    viewModel.debug()
 
     // states and data
     val cryptos by viewModel.cryptos.observeAsState(emptyList())
@@ -143,7 +149,6 @@ fun Content(
             modifier = Modifier.background(Color.Blue)
         ) {
             items(items = cryptos, key = {it.id}) { crypto ->
-                // Pass the crypto data to the ListItem
                 ListItem(crypto, onListItemClicked)
             }
         }

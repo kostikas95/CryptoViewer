@@ -33,19 +33,24 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.cryptoviewer.R
 import com.example.cryptoviewer.database.SortField
 import com.example.cryptoviewer.model.CryptoCurrency
+import com.example.cryptoviewer.ui.market.MarketViewModel
 import com.example.cryptoviewer.ui.reusables.BottomBar
 import com.example.cryptoviewer.ui.reusables.ListItem
 import com.example.cryptoviewer.ui.reusables.ScrollListHeadline
 
 @Composable
-fun SearchScreen(navController: NavHostController) {
-    // view model
-    val viewModel : SearchViewModel = viewModel()
+fun SearchScreen(
+    navController: NavHostController,
+    viewModelStoreOwner: ViewModelStoreOwner
+) {
+    val viewModel: SearchViewModel = viewModel(viewModelStoreOwner)
+    viewModel.debug()
 
     // states and data
     val cryptos by viewModel.cryptos.observeAsState(emptyList())

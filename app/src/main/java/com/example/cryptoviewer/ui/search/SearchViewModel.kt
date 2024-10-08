@@ -41,6 +41,17 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     private var batchesProjected: Int = 0
     private var perDbQuery = 50
 
+    fun debug() {
+        Log.d("ViewModel", "navigated back to SearchScreen")
+        Log.d("ViewModel", "_cryptos: ${_cryptos.value?.size} cryptos.")
+        Log.d("ViewModel", "order by ${_order.value?.first} ${_order.value?.second}")
+        Log.d("ViewModel", "batches projected: ${batchesProjected}")
+    }
+
+    init {
+        Log.d("ViewModel", "ViewModel initialized")
+    }
+
     fun updateSearchText(newText: String) {
         searchText.value = newText
 
