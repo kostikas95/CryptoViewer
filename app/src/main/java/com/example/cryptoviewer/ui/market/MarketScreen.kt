@@ -2,8 +2,10 @@ package com.example.cryptoviewer.ui.market
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -16,7 +18,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,6 +30,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -43,6 +48,7 @@ import com.example.cryptoviewer.navigation.Market
 import com.example.cryptoviewer.navigation.Search
 import com.example.cryptoviewer.ui.reusables.BottomBar
 import com.example.cryptoviewer.ui.reusables.ListItem
+import com.example.cryptoviewer.ui.reusables.ScrollListHeadline
 import kotlinx.coroutines.flow.filter
 
 @Composable
@@ -58,6 +64,9 @@ fun MarketScreen(navController: NavHostController) {
     // lambdas
     val onSortingFactorTextClick : (SortField) -> Unit = { newField ->
         viewModel.changeOrder(newField)
+    }
+    val onListItemClicked : (String) -> Unit = { id ->
+        viewModel.addToFavourites(id)
     }
 
     LaunchedEffect(lazyListState) {
@@ -75,7 +84,8 @@ fun MarketScreen(navController: NavHostController) {
             Content(innerPadding,
                 cryptos,
                 lazyListState,
-                onSortingFactorTextClick
+                onSortingFactorTextClick,
+                onListItemClicked
             )
         }
     )
@@ -113,104 +123,20 @@ fun AutoScrollToTopButton() {
 
 }
 
-// pass cryptos here
 @Composable
 fun Content(
     innerPadding: PaddingValues,
     cryptos: List<CryptoCurrency>,
     lazyListState: LazyListState,
-    onSortingFactorTextClick: (SortField) -> Unit
-    // onLoadMore : suspend () -> Unit
+    onSortingFactorTextClick: (SortField) -> Unit,
+    onListItemClicked: (String) -> Unit
 ) {
 
     Column(
         modifier = Modifier.fillMaxSize()
             .padding(innerPadding)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(1f)
-                .background((Color.Yellow)),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            /*
-            Maybe this row contains 5 boxes { Text }
-            The boxes will have the same weights as the elements of the lazy column.
-            Then I can modify the text to achieve the desired text space and position,
-            without worrying about destroying the alignment with the values in the
-            lazy column. Also, by doing that, the clickable space will be the text's
-            space and not the box's space.
-             */
-
-            Text(
-                modifier = Modifier.weight(1f)
-                    .clickable {
-                    onSortingFactorTextClick(SortField.MARKET_CAP_RANK)
-                    },
-                text = "#",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Thin,
-                maxLines = 2,
-                textAlign = TextAlign.Center,
-                overflow = TextOverflow.Ellipsis,
-                softWrap = true
-            )
-            Text(
-                modifier = Modifier.weight(1f)
-                    .clickable {
-                        onSortingFactorTextClick(SortField.SYMBOL)
-                    },
-                text = "COIN",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Thin,
-                maxLines = 2,
-                textAlign = TextAlign.Center,
-                overflow = TextOverflow.Ellipsis,
-                softWrap = true
-            )
-            Text(
-                modifier = Modifier.weight(1f)
-                    .clickable {
-                        onSortingFactorTextClick(SortField.CURRENT_PRICE)
-                    },
-                text = "CURRENT\nPRICE",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Thin,
-                maxLines = 2,
-                lineHeight = 18.sp,
-                textAlign = TextAlign.End,
-                overflow = TextOverflow.Ellipsis,
-                softWrap = true
-            )
-            Text(
-                modifier = Modifier.weight(1f)
-                    .clickable {
-                        onSortingFactorTextClick(SortField.PRICE_CHANGE)
-                    },
-                text = "PRICE\nCHANGE(%)",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Thin,
-                maxLines = 2,
-                lineHeight = 18.sp,
-                textAlign = TextAlign.End,
-                overflow = TextOverflow.Ellipsis,
-                softWrap = true
-            )
-            Text(
-                modifier = Modifier.weight(1f)
-                    .clickable {
-                        onSortingFactorTextClick(SortField.MARKET_CAP)
-                    },
-                text = "MARKET\nCAP",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Thin,
-                maxLines = 2,
-                lineHeight = 18.sp,
-                textAlign = TextAlign.End,
-                overflow = TextOverflow.Ellipsis,
-                softWrap = true
-            )
-        }
+        ScrollListHeadline(onSortingFactorTextClick)
 
         LazyColumn(
             state = lazyListState,
@@ -218,7 +144,7 @@ fun Content(
         ) {
             items(items = cryptos, key = {it.id}) { crypto ->
                 // Pass the crypto data to the ListItem
-                ListItem(crypto)
+                ListItem(crypto, onListItemClicked)
             }
         }
     }

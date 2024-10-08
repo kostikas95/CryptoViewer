@@ -13,100 +13,58 @@ interface CryptoCurrencyDao {
 
     // --------------------------------- EXPLORE SCREEN -------------------------------------------
 
-    // get by market cap rank
-    @Query("SELECT * FROM cryptocurrencies ORDER BY marketCapRank ASC")
-    suspend fun getCryptosByMarketCapRankAsc(): List<CryptoCurrency>
-
+    // order by market cap rank
     @Query("SELECT * FROM cryptocurrencies ORDER BY marketCapRank ASC LIMIT :limit OFFSET :offset")
-    suspend fun getCryptosByMarketCapRankAsc(limit: Int, offset: Int): List<CryptoCurrency>
-
-    @Query("SELECT * FROM cryptocurrencies ORDER BY marketCapRank DESC")
-    suspend fun getCryptosByMarketCapRankDsc(): List<CryptoCurrency>
+    suspend fun getCryptosOrderByMarketCapRankAsc(limit: Int, offset: Int): List<CryptoCurrency>
 
     @Query("SELECT * FROM cryptocurrencies ORDER BY marketCapRank DESC LIMIT :limit OFFSET :offset")
-    suspend fun getCryptosByMarketCapRankDsc(limit: Int, offset: Int): List<CryptoCurrency>
+    suspend fun getCryptosOrderByMarketCapRankDsc(limit: Int, offset: Int): List<CryptoCurrency>
 
-    // get by symbol
-    @Query("SELECT * FROM cryptocurrencies ORDER BY symbol ASC")
-    suspend fun getCryptosBySymbolAsc(): List<CryptoCurrency>
-
+    // order by symbol
     @Query("SELECT * FROM cryptocurrencies ORDER BY symbol ASC LIMIT :limit OFFSET :offset")
-    suspend fun getCryptosBySymbolAsc(limit: Int, offset: Int): List<CryptoCurrency>
-
-    @Query("SELECT * FROM cryptocurrencies ORDER BY symbol DESC")
-    suspend fun getCryptosBySymbolDsc(): List<CryptoCurrency>
+    suspend fun getCryptosOrderBySymbolAsc(limit: Int, offset: Int): List<CryptoCurrency>
 
     @Query("SELECT * FROM cryptocurrencies ORDER BY symbol DESC LIMIT :limit OFFSET :offset")
-    suspend fun getCryptosBySymbolDsc(limit: Int, offset: Int): List<CryptoCurrency>
+    suspend fun getCryptosOrderBySymbolDsc(limit: Int, offset: Int): List<CryptoCurrency>
 
-    // get by name
-    @Query("SELECT * FROM cryptocurrencies ORDER BY name ASC")
-    suspend fun getCryptosByNameAsc(): List<CryptoCurrency>
-
+    // order by name
     @Query("SELECT * FROM cryptocurrencies ORDER BY name ASC LIMIT :limit OFFSET :offset")
-    suspend fun getCryptosByNameAsc(limit: Int, offset: Int): List<CryptoCurrency>
-
-    @Query("SELECT * FROM cryptocurrencies ORDER BY name DESC")
-    suspend fun getCryptosByNameDsc(): List<CryptoCurrency>
+    suspend fun getCryptosOrderByNameAsc(limit: Int, offset: Int): List<CryptoCurrency>
 
     @Query("SELECT * FROM cryptocurrencies ORDER BY name DESC LIMIT :limit OFFSET :offset")
-    suspend fun getCryptosByNameDsc(limit: Int, offset: Int): List<CryptoCurrency>
+    suspend fun getCryptosOrderByNameDsc(limit: Int, offset: Int): List<CryptoCurrency>
 
-    // get by id
-    @Query("SELECT * FROM cryptocurrencies ORDER BY id ASC")
-    suspend fun getCryptosByIdAsc(): List<CryptoCurrency>
-
+    // order by id
     @Query("SELECT * FROM cryptocurrencies ORDER BY id ASC LIMIT :limit OFFSET :offset")
-    suspend fun getCryptosByIdAsc(limit: Int, offset: Int): List<CryptoCurrency>
-
-    @Query("SELECT * FROM cryptocurrencies ORDER BY id DESC")
-    suspend fun getCryptosByIdDsc(): List<CryptoCurrency>
+    suspend fun getCryptosOrderByIdAsc(limit: Int, offset: Int): List<CryptoCurrency>
 
     @Query("SELECT * FROM cryptocurrencies ORDER BY id DESC LIMIT :limit OFFSET :offset")
-    suspend fun getCryptosByIdDsc(limit: Int, offset: Int): List<CryptoCurrency>
+    suspend fun getCryptosOrderByIdDsc(limit: Int, offset: Int): List<CryptoCurrency>
 
-    // get by current price
-    @Query("SELECT * FROM cryptocurrencies ORDER BY currentPrice ASC")
-    suspend fun getCryptosByCurrentPriceAsc(): List<CryptoCurrency>
-
+    // order by current price
     @Query("SELECT * FROM cryptocurrencies ORDER BY currentPrice ASC LIMIT :limit OFFSET :offset")
-    suspend fun getCryptosByCurrentPriceAsc(limit: Int, offset: Int): List<CryptoCurrency>
-
-    @Query("SELECT * FROM cryptocurrencies ORDER BY currentPrice DESC")
-    suspend fun getCryptosByCurrentPriceDsc(): List<CryptoCurrency>
+    suspend fun getCryptosOrderByCurrentPriceAsc(limit: Int, offset: Int): List<CryptoCurrency>
 
     @Query("SELECT * FROM cryptocurrencies ORDER BY currentPrice DESC LIMIT :limit OFFSET :offset")
-    suspend fun getCryptosByCurrentPriceDsc(limit: Int, offset: Int): List<CryptoCurrency>
+    suspend fun getCryptosOrderByCurrentPriceDsc(limit: Int, offset: Int): List<CryptoCurrency>
 
-    // get by price change percentage in 24h
-    @Query("SELECT * FROM cryptocurrencies ORDER BY priceChangePercentage24h ASC")
-    suspend fun getCryptosByPriceChangePercentageAsc(): List<CryptoCurrency>
-
+    // order by price change percentage in 24h
     @Query("SELECT * FROM cryptocurrencies ORDER BY priceChangePercentage24h ASC LIMIT :limit OFFSET :offset")
-    suspend fun getCryptosByPriceChangePercentageAsc(limit: Int, offset: Int): List<CryptoCurrency>
-
-    @Query("SELECT * FROM cryptocurrencies ORDER BY priceChangePercentage24h DESC")
-    suspend fun getCryptosByPriceChangePercentageDsc(): List<CryptoCurrency>
+    suspend fun getCryptosOrderByPriceChangePercentageAsc(limit: Int, offset: Int): List<CryptoCurrency>
 
     @Query("SELECT * FROM cryptocurrencies ORDER BY priceChangePercentage24h DESC LIMIT :limit OFFSET :offset")
-    suspend fun getCryptosByPriceChangePercentageDsc(limit: Int, offset: Int): List<CryptoCurrency>
+    suspend fun getCryptosOrderByPriceChangePercentageDsc(limit: Int, offset: Int): List<CryptoCurrency>
 
-    // get by market cap
-    @Query("SELECT * FROM cryptocurrencies ORDER BY marketCap ASC")
-    suspend fun getCryptosByMarketCapAsc(): List<CryptoCurrency>
-
+    // order by market cap
     @Query("SELECT * FROM cryptocurrencies ORDER BY marketCap ASC LIMIT :limit OFFSET :offset")
-    suspend fun getCryptosByMarketCapAsc(limit: Int, offset: Int): List<CryptoCurrency>
-
-    @Query("SELECT * FROM cryptocurrencies ORDER BY marketCap DESC")
-    suspend fun getCryptosByMarketCapDsc(): List<CryptoCurrency>
+    suspend fun getCryptosOrderByMarketCapAsc(limit: Int, offset: Int): List<CryptoCurrency>
 
     @Query("SELECT * FROM cryptocurrencies ORDER BY marketCap DESC LIMIT :limit OFFSET :offset")
-    suspend fun getCryptosByMarketCapDsc(limit: Int, offset: Int): List<CryptoCurrency>
+    suspend fun getCryptosOrderByMarketCapDsc(limit: Int, offset: Int): List<CryptoCurrency>
 
 
     // ---------------------------------- SEARCH SCREEN --------------------------------------------
-    
+    // order by market cap rank
     @Query("""
         SELECT * FROM cryptocurrencies
         WHERE symbol LIKE '%' || :text || '%'
@@ -114,11 +72,8 @@ interface CryptoCurrencyDao {
         ORDER BY marketCapRank ASC
         LIMIT :limit OFFSET :offset
     """)
-    suspend fun getCryptosLikeByMarketCapRankAsc(limit: Int, offset: Int, text: String): List<CryptoCurrency>
+    suspend fun getCryptosLikeOrderByMarketCapRankAsc(limit: Int, offset: Int, text: String): List<CryptoCurrency>
 
-
-
-    // @Query("SELECT * FROM cryptocurrencies ORDER BY marketCapRank DESC LIMIT :limit OFFSET :offset")
     @Query("""
         SELECT * FROM cryptocurrencies
         WHERE symbol LIKE '%' || :text || '%'
@@ -126,9 +81,9 @@ interface CryptoCurrencyDao {
         ORDER BY marketCapRank DESC
         LIMIT :limit OFFSET :offset
     """)
-    suspend fun getCryptosLikeByMarketCapRankDsc(limit: Int, offset: Int, text: String): List<CryptoCurrency>
+    suspend fun getCryptosLikeOrderByMarketCapRankDsc(limit: Int, offset: Int, text: String): List<CryptoCurrency>
 
-    // get by symbol
+    // order by symbol
     @Query("""
         SELECT * FROM cryptocurrencies
         WHERE symbol LIKE '%' || :text || '%'
@@ -136,7 +91,7 @@ interface CryptoCurrencyDao {
         ORDER BY symbol ASC
         LIMIT :limit OFFSET :offset
     """)
-    suspend fun getCryptosLikeBySymbolAsc(limit: Int, offset: Int, text: String): List<CryptoCurrency>
+    suspend fun getCryptosLikeOrderBySymbolAsc(limit: Int, offset: Int, text: String): List<CryptoCurrency>
 
     @Query("""
         SELECT * FROM cryptocurrencies
@@ -145,9 +100,9 @@ interface CryptoCurrencyDao {
         ORDER BY symbol DESC
         LIMIT :limit OFFSET :offset
     """)
-    suspend fun getCryptosLikeBySymbolDsc(limit: Int, offset: Int, text: String): List<CryptoCurrency>
+    suspend fun getCryptosLikeOrderBySymbolDsc(limit: Int, offset: Int, text: String): List<CryptoCurrency>
 
-    // get by id
+    // order by id
     @Query("""
         SELECT * FROM cryptocurrencies
         WHERE symbol LIKE '%' || :text || '%'
@@ -155,7 +110,7 @@ interface CryptoCurrencyDao {
         ORDER BY id ASC
         LIMIT :limit OFFSET :offset
     """)
-    suspend fun getCryptosLikeByIdAsc(limit: Int, offset: Int, text: String): List<CryptoCurrency>
+    suspend fun getCryptosLikeOrderByIdAsc(limit: Int, offset: Int, text: String): List<CryptoCurrency>
 
     @Query("""
         SELECT * FROM cryptocurrencies
@@ -164,9 +119,9 @@ interface CryptoCurrencyDao {
         ORDER BY id DESC
         LIMIT :limit OFFSET :offset
     """)
-    suspend fun getCryptosLikeByIdDsc(limit: Int, offset: Int, text: String): List<CryptoCurrency>
+    suspend fun getCryptosLikeOrderByIdDsc(limit: Int, offset: Int, text: String): List<CryptoCurrency>
 
-    // get by current price
+    // order by current price
     @Query("""
         SELECT * FROM cryptocurrencies
         WHERE symbol LIKE '%' || :text || '%'
@@ -174,7 +129,7 @@ interface CryptoCurrencyDao {
         ORDER BY currentPrice ASC
         LIMIT :limit OFFSET :offset
     """)
-    suspend fun getCryptosLikeByCurrentPriceAsc(limit: Int, offset: Int, text: String): List<CryptoCurrency>
+    suspend fun getCryptosLikeOrderByCurrentPriceAsc(limit: Int, offset: Int, text: String): List<CryptoCurrency>
 
     @Query("""
         SELECT * FROM cryptocurrencies
@@ -183,9 +138,9 @@ interface CryptoCurrencyDao {
         ORDER BY currentPrice DESC
         LIMIT :limit OFFSET :offset
     """)
-    suspend fun getCryptosLikeByCurrentPriceDsc(limit: Int, offset: Int, text: String): List<CryptoCurrency>
+    suspend fun getCryptosLikeOrderByCurrentPriceDsc(limit: Int, offset: Int, text: String): List<CryptoCurrency>
 
-    // get by price change percentage in 24h
+    // order by price change percentage in 24h
     @Query("""
         SELECT * FROM cryptocurrencies
         WHERE symbol LIKE '%' || :text || '%'
@@ -193,7 +148,7 @@ interface CryptoCurrencyDao {
         ORDER BY priceChangePercentage24h ASC
         LIMIT :limit OFFSET :offset
     """)
-    suspend fun getCryptosLikeByPriceChangePercentageAsc(limit: Int, offset: Int, text: String): List<CryptoCurrency>
+    suspend fun getCryptosLikeOrderByPriceChangePercentageAsc(limit: Int, offset: Int, text: String): List<CryptoCurrency>
 
     @Query("""
         SELECT * FROM cryptocurrencies
@@ -202,9 +157,9 @@ interface CryptoCurrencyDao {
         ORDER BY priceChangePercentage24h DESC
         LIMIT :limit OFFSET :offset
     """)
-    suspend fun getCryptosLikeByPriceChangePercentageDsc(limit: Int, offset: Int, text: String): List<CryptoCurrency>
+    suspend fun getCryptosLikeOrderByPriceChangePercentageDsc(limit: Int, offset: Int, text: String): List<CryptoCurrency>
 
-    // get by market cap
+    // order by market cap
     @Query("""
         SELECT * FROM cryptocurrencies
         WHERE symbol LIKE '%' || :text || '%'
@@ -212,7 +167,7 @@ interface CryptoCurrencyDao {
         ORDER BY marketCap ASC
         LIMIT :limit OFFSET :offset
     """)
-    suspend fun getCryptosLikeByMarketCapAsc(limit: Int, offset: Int, text: String): List<CryptoCurrency>
+    suspend fun getCryptosLikeOrderByMarketCapAsc(limit: Int, offset: Int, text: String): List<CryptoCurrency>
 
     @Query("""
         SELECT * FROM cryptocurrencies
@@ -221,10 +176,99 @@ interface CryptoCurrencyDao {
         ORDER BY marketCap DESC
         LIMIT :limit OFFSET :offset
     """)
-    suspend fun getCryptosLikeByMarketCapDsc(limit: Int, offset: Int, text: String): List<CryptoCurrency>
+    suspend fun getCryptosLikeOrderByMarketCapDsc(limit: Int, offset: Int, text: String): List<CryptoCurrency>
 
 
+    // -------------------------------- FAVOURITES SCREEN ------------------------------------------
+    // order by market cap rank
+    @Query("""
+        SELECT * FROM cryptocurrencies
+        WHERE id IN (:ids)
+        ORDER BY marketCapRank ASC
+    """)
+    suspend fun getCryptosByIdsOrderByMarketCapRankAsc(ids: List<String>): List<CryptoCurrency>
 
+    @Query("""
+        SELECT * FROM cryptocurrencies
+        WHERE id IN (:ids)
+        ORDER BY marketCapRank DESC
+    """)
+    suspend fun getCryptosByIdsOrderByMarketCapRankDsc(ids: List<String>): List<CryptoCurrency>
+
+    // order by symbol
+    @Query("""
+        SELECT * FROM cryptocurrencies
+        WHERE id IN (:ids)
+        ORDER BY symbol ASC
+    """)
+    suspend fun getCryptosByIdsOrderBySymbolAsc(ids: List<String>): List<CryptoCurrency>
+
+    @Query("""
+        SELECT * FROM cryptocurrencies
+        WHERE id IN (:ids)
+        ORDER BY symbol DESC
+    """)
+    suspend fun getCryptosByIdsOrderBySymbolDsc(ids: List<String>): List<CryptoCurrency>
+
+    // order by id
+    @Query("""
+        SELECT * FROM cryptocurrencies
+        WHERE id IN (:ids)
+        ORDER BY id ASC
+    """)
+    suspend fun getCryptosByIdsOrderByIdAsc(ids: List<String>): List<CryptoCurrency>
+
+    @Query("""
+        SELECT * FROM cryptocurrencies
+        WHERE id IN (:ids)
+        ORDER BY id DESC
+    """)
+    suspend fun getCryptosByIdsOrderByIdDsc(ids: List<String>): List<CryptoCurrency>
+
+    // order by current price
+    @Query("""
+        SELECT * FROM cryptocurrencies
+        WHERE id IN (:ids)
+        ORDER BY currentPrice ASC
+    """)
+    suspend fun getCryptosByIdsOrderByCurrentPriceAsc(ids: List<String>): List<CryptoCurrency>
+
+    @Query("""
+        SELECT * FROM cryptocurrencies
+        WHERE id IN (:ids)
+        ORDER BY currentPrice DESC
+    """)
+    suspend fun getCryptosByIdsOrderByCurrentPriceDsc(ids: List<String>): List<CryptoCurrency>
+
+    // order by price change percentage in 24h
+    @Query("""
+        SELECT * FROM cryptocurrencies
+        WHERE id IN (:ids)
+        ORDER BY priceChangePercentage24h ASC
+    """)
+    suspend fun getCryptosByIdsOrderByPriceChangePercentageAsc(ids: List<String>): List<CryptoCurrency>
+
+    @Query("""
+        SELECT * FROM cryptocurrencies
+        WHERE id IN (:ids)
+        ORDER BY priceChangePercentage24h DESC
+    """)
+    suspend fun getCryptosByIdsOrderByPriceChangePercentageDsc(ids: List<String>): List<CryptoCurrency>
+
+    // order by market cap
+    @Query("""
+        SELECT * FROM cryptocurrencies
+        WHERE id IN (:ids)
+        ORDER BY marketCap ASC
+    """)
+    suspend fun getCryptosByIdsOrderByMarketCapAsc(ids: List<String>): List<CryptoCurrency>
+
+    @Query("""
+        SELECT * FROM cryptocurrencies
+        WHERE id IN (:ids)
+        ORDER BY marketCap DESC
+    """)
+    suspend fun getCryptosByIdsOrderByMarketCapDsc(ids: List<String>): List<CryptoCurrency>
 
 
 

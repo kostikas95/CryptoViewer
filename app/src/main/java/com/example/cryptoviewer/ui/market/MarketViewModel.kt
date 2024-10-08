@@ -14,13 +14,16 @@ import com.example.cryptoviewer.model.CryptoCurrency
 import com.example.cryptoviewer.network.ApiVsCurrency
 import com.example.cryptoviewer.network.CryptoApiService
 import com.example.cryptoviewer.network.RetrofitInstance
+import com.example.cryptoviewer.preferences.PreferencesDataStore
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class MarketViewModel(application: Application) : AndroidViewModel(application) {
 
     private val cryptoDao: CryptoCurrencyDao = CryptoDatabase.getDatabase(application).cryptoDao()
     private val cryptoApi: CryptoApiService = RetrofitInstance.api
+    private val appContext: Application = application
 
 
     private val _cryptos = MutableLiveData<List<CryptoCurrency>>(emptyList())
@@ -55,7 +58,7 @@ class MarketViewModel(application: Application) : AndroidViewModel(application) 
                     Log.d("fetchAllCryptoFromApi", "first crypto in fetched batch: ${batch.first().id}")
                     cryptoDao.insertCryptos(batch)
                     if (batchesProjected == 0) {
-                        val fromDb : List<CryptoCurrency> = cryptoDao.getCryptosByMarketCapRankAsc(limit = perDbQuery, offset = 0)
+                        val fromDb : List<CryptoCurrency> = cryptoDao.getCryptosOrderByMarketCapRankAsc(limit = perDbQuery, offset = 0)
                         batchesProjected++
                         Log.d("fetchAllCryptoFromApi", "first crypto from db: ${batch.first().id}")
                         _cryptos.postValue(fromDb)
@@ -114,30 +117,42 @@ class MarketViewModel(application: Application) : AndroidViewModel(application) 
 
         var nextBatch: List<CryptoCurrency> = emptyList()
         if (currentOrder?.first == SortField.MARKET_CAP_RANK && currentOrder.second == SortOrder.ASCENDING) {
-            nextBatch = cryptoDao.getCryptosByMarketCapRankAsc(perDbQuery, batchesProjected * perDbQuery)
+            nextBatch = cryptoDao.getCryptosOrderByMarketCapRankAsc(perDbQuery, batchesProjected * perDbQuery)
         } else if (currentOrder?.first == SortField.MARKET_CAP_RANK && currentOrder.second == SortOrder.DESCENDING) {
-            nextBatch = cryptoDao.getCryptosByMarketCapRankDsc(perDbQuery, batchesProjected * perDbQuery)
+            nextBatch = cryptoDao.getCryptosOrderByMarketCapRankDsc(perDbQuery, batchesProjected * perDbQuery)
         }
         else if (currentOrder?.first == SortField.SYMBOL && currentOrder.second == SortOrder.ASCENDING) {
-            nextBatch = cryptoDao.getCryptosBySymbolAsc(perDbQuery, batchesProjected * perDbQuery)
+            nextBatch = cryptoDao.getCryptosOrderBySymbolAsc(perDbQuery, batchesProjected * perDbQuery)
         } else if (currentOrder?.first == SortField.SYMBOL && currentOrder.second == SortOrder.DESCENDING) {
-            nextBatch = cryptoDao.getCryptosBySymbolDsc(perDbQuery, batchesProjected * perDbQuery)
+            nextBatch = cryptoDao.getCryptosOrderBySymbolDsc(perDbQuery, batchesProjected * perDbQuery)
         }
         else if (currentOrder?.first == SortField.CURRENT_PRICE && currentOrder.second == SortOrder.ASCENDING) {
-            nextBatch = cryptoDao.getCryptosByCurrentPriceAsc(perDbQuery, batchesProjected * perDbQuery)
+            nextBatch = cryptoDao.getCryptosOrderByCurrentPriceAsc(perDbQuery, batchesProjected * perDbQuery)
         } else if (currentOrder?.first == SortField.CURRENT_PRICE && currentOrder.second == SortOrder.DESCENDING) {
-            nextBatch = cryptoDao.getCryptosByCurrentPriceDsc(perDbQuery, batchesProjected * perDbQuery)
+            nextBatch = cryptoDao.getCryptosOrderByCurrentPriceDsc(perDbQuery, batchesProjected * perDbQuery)
         }
         else if (currentOrder?.first == SortField.PRICE_CHANGE && currentOrder.second == SortOrder.ASCENDING) {
-            nextBatch = cryptoDao.getCryptosByPriceChangePercentageAsc(perDbQuery, batchesProjected * perDbQuery)
+            nextBatch = cryptoDao.getCryptosOrderByPriceChangePercentageAsc(perDbQuery, batchesProjected * perDbQuery)
         } else if (currentOrder?.first == SortField.PRICE_CHANGE && currentOrder.second == SortOrder.DESCENDING) {
-            nextBatch = cryptoDao.getCryptosByPriceChangePercentageDsc(perDbQuery, batchesProjected * perDbQuery)
+            nextBatch = cryptoDao.getCryptosOrderByPriceChangePercentageDsc(perDbQuery, batchesProjected * perDbQuery)
         }
         else if (currentOrder?.first == SortField.MARKET_CAP && currentOrder.second == SortOrder.ASCENDING) {
-            nextBatch = cryptoDao.getCryptosByMarketCapAsc(perDbQuery, batchesProjected * perDbQuery)
+            nextBatch = cryptoDao.getCryptosOrderByMarketCapAsc(perDbQuery, batchesProjected * perDbQuery)
         } else if (currentOrder?.first == SortField.MARKET_CAP && currentOrder.second == SortOrder.DESCENDING) {
-            nextBatch = cryptoDao.getCryptosByMarketCapDsc(perDbQuery, batchesProjected * perDbQuery)
+            nextBatch = cryptoDao.getCryptosOrderByMarketCapDsc(perDbQuery, batchesProjected * perDbQuery)
         }
         return nextBatch
+    }
+
+    fun addToFavourites(id: String) {
+        viewModelScope.launch {
+            PreferencesDataStore.addToFavorites(appContext, id)
+        }
+    }
+
+    fun removeFromFavourites(id: String) {
+        viewModelScope.launch {
+            PreferencesDataStore.removeFromFavourites(appContext, id)
+        }
     }
 }

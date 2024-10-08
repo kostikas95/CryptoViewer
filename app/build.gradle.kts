@@ -77,7 +77,6 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
 
-
     // room
     implementation(libs.androidx.room.runtime)
     kapt(libs.androidx.room.compiler)
@@ -90,6 +89,9 @@ dependencies {
     // coil for svgs
     implementation(libs.coil.compose)
     implementation(libs.coil.svg)
+
+    // datastore
+    implementation(libs.androidx.datastore.preferences)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

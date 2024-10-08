@@ -2,6 +2,7 @@ package com.example.cryptoviewer.ui.reusables
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,27 +16,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.cryptoviewer.R
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.rememberAsyncImagePainter
 import com.example.cryptoviewer.formatNumberForDisplay
 import com.example.cryptoviewer.model.CryptoCurrency
 import java.util.Locale
 
 @Composable
-fun ListItem(crypto: CryptoCurrency) {
-    /*
-    <coin image>
-    <coin symbol>    <coin price>    <coin price change>   <coin market cap>
-     */
+fun ListItem(
+    crypto: CryptoCurrency,
+    onClick: (String) -> Unit
+) {
 
+    val painter = rememberAsyncImagePainter(crypto.imageUrl)
     Row(
         modifier = Modifier.padding(8.dp)
             .fillMaxWidth(1f)
             .height(72.dp)
-            .border(1.dp, Color.Red),
+            .border(1.dp, Color.Red)
+            .clickable {
+                onClick(crypto.id)
+            },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -45,37 +50,36 @@ fun ListItem(crypto: CryptoCurrency) {
                 .padding(5.dp),
             text = crypto.marketCapRank.toString(),
             fontSize = 16.sp,
-            textAlign = TextAlign.End
+            textAlign = TextAlign.Center
         )
         Column(
-            modifier = Modifier.weight(1f)
-                .border(1.dp, Color.Green)
-                .padding(end = 15.dp),
+            modifier = Modifier.weight(0.8f)
+                .border(1.dp, Color.Green),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Image(
-                painterResource(R.drawable.top_app_bar_image),
+                painter = painter,
                 contentDescription = "crypto image",
                 modifier = Modifier.size(30.dp, 30.dp),
                 contentScale = ContentScale.Fit
             )
             Text(
                 text = crypto.symbol,
-                fontSize = 18.sp
+                fontSize = 18.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
 
         }
         Text(
             modifier = Modifier.weight(1.2f)
-                .border(1.dp, Color.Green)
-                .padding(5.dp),
+                .border(1.dp, Color.Green),
             text = "$" + formatNumberForDisplay(crypto.currentPrice, maxLength = 6),
             fontSize = 16.sp,
             textAlign = TextAlign.End
         )
         Text(
-            modifier = Modifier.weight(1.5f).
-            padding(end = 10.dp)
+            modifier = Modifier.weight(1.3f)
                 .border(1.dp, Color.Green),
             text = String.format(Locale.US, "%.3f", crypto.priceChangePercentage24h) + "%",
             fontSize = 16.sp,

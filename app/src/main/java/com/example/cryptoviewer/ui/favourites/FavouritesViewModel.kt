@@ -1,8 +1,9 @@
-package com.example.cryptoviewer.ui.search
+package com.example.cryptoviewer.ui.favourites
 
+import android.annotation.SuppressLint
 import android.app.Application
+import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -16,14 +17,19 @@ import com.example.cryptoviewer.network.CryptoApiService
 import com.example.cryptoviewer.network.RetrofitInstance
 import com.example.cryptoviewer.preferences.PreferencesDataStore
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-class SearchViewModel(application: Application) : AndroidViewModel(application) {
+
+class FavouritesViewModel(application: Application) : AndroidViewModel(application) {
 
     private val cryptoDao: CryptoCurrencyDao = CryptoDatabase.getDatabase(application).cryptoDao()
     private val cryptoApi: CryptoApiService = RetrofitInstance.api
     private val appContext: Application = application
+
+
+    val favoriteIdsFlow: Flow<Set<String>> = PreferencesDataStore.getFavoriteIds(appContext)
 
     private val _cryptos = MutableLiveData<List<CryptoCurrency>>(emptyList())
     val cryptos: LiveData<List<CryptoCurrency>> = _cryptos
@@ -33,27 +39,15 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     )
     // val order: LiveData<Pair<SortField, SortOrder>> = _order
 
-    var searchText = mutableStateOf("")
-        private set
-
-    private var searchJob: Job? = null
     private var batchJob: Job? = null
-    private var batchesProjected: Int = 0
-    private var perDbQuery = 50
 
-    fun updateSearchText(newText: String) {
-        searchText.value = newText
 
-        searchJob?.cancel()
-        batchJob?.cancel()
-
-        searchJob = viewModelScope.launch {
-            delay(500)
-            _cryptos.postValue(emptyList())
-            batchesProjected = 0
-            loadNextPage()
+    init {
+        viewModelScope.launch {
+            PreferencesDataStore.getFavoriteIds(appContext).collect { favourites ->
+                _cryptos.postValue(fetchFavouritesFromDb(favourites.toList()))
+            }
         }
-
     }
 
     fun changeOrder(newField : SortField) {
@@ -69,60 +63,55 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         Log.d("changeOrder", "new order: ${_order.value?.first}    ${_order.value?.second}")
 
         _cryptos.postValue(emptyList())
-        batchesProjected = 0
         batchJob = viewModelScope.launch {
-            loadNextPage()
+            val favourites = PreferencesDataStore.getFavoriteIds(appContext).first().toList()
+            fetchFavouritesFromDb(favourites)
         }
     }
 
-    suspend fun loadNextPage() {
-        val nextBatch: List<CryptoCurrency> = fetchNextBatchFromDb(
-            limit = perDbQuery,
-            offset = batchesProjected * perDbQuery)
-        batchesProjected++
-        Log.d("loadNextPage", "${nextBatch.size} cryptos fetched from db")
-        val currentList = _cryptos.value ?: emptyList()
-        Log.d("loadNextPage", "${currentList.size} cryptos in live data")
-        val updatedList = currentList + nextBatch
-        _cryptos.postValue(updatedList)
-        Log.d("loadNextPage", "${_cryptos.value?.size} cryptos in live data")
-    }
-
-    private suspend fun fetchNextBatchFromDb(limit: Int, offset: Int) : List<CryptoCurrency> {
+    private suspend fun fetchFavouritesFromDb(ids: List<String>) : List<CryptoCurrency> {
         val currentOrder = _order.value
-        var nextBatch: List<CryptoCurrency> = emptyList()
-        val text: String = searchText.value
+
+        var cryptosFromDb: List<CryptoCurrency> = emptyList()
+
         if (currentOrder?.first == SortField.MARKET_CAP_RANK && currentOrder.second == SortOrder.ASCENDING) {
-            nextBatch = cryptoDao.getCryptosLikeOrderByMarketCapRankAsc(limit, offset, text)
+            cryptosFromDb = cryptoDao.getCryptosByIdsOrderByMarketCapRankAsc(ids)
         } else if (currentOrder?.first == SortField.MARKET_CAP_RANK && currentOrder.second == SortOrder.DESCENDING) {
-            nextBatch = cryptoDao.getCryptosLikeOrderByMarketCapRankDsc(limit, offset, text)
+            cryptosFromDb = cryptoDao.getCryptosByIdsOrderByMarketCapRankDsc(ids)
         }
         else if (currentOrder?.first == SortField.SYMBOL && currentOrder.second == SortOrder.ASCENDING) {
-            nextBatch = cryptoDao.getCryptosLikeOrderBySymbolAsc(limit, offset, text)
+            cryptosFromDb = cryptoDao.getCryptosByIdsOrderBySymbolAsc(ids)
         } else if (currentOrder?.first == SortField.SYMBOL && currentOrder.second == SortOrder.DESCENDING) {
-            nextBatch = cryptoDao.getCryptosLikeOrderBySymbolDsc(limit, offset, text)
+            cryptosFromDb = cryptoDao.getCryptosByIdsOrderBySymbolDsc(ids)
         }
         else if (currentOrder?.first == SortField.CURRENT_PRICE && currentOrder.second == SortOrder.ASCENDING) {
-            nextBatch = cryptoDao.getCryptosLikeOrderByCurrentPriceAsc(limit, offset, text)
+            cryptosFromDb = cryptoDao.getCryptosByIdsOrderByCurrentPriceAsc(ids)
         } else if (currentOrder?.first == SortField.CURRENT_PRICE && currentOrder.second == SortOrder.DESCENDING) {
-            nextBatch = cryptoDao.getCryptosLikeOrderByCurrentPriceDsc(limit, offset, text)
+            cryptosFromDb = cryptoDao.getCryptosByIdsOrderByCurrentPriceDsc(ids)
         }
         else if (currentOrder?.first == SortField.PRICE_CHANGE && currentOrder.second == SortOrder.ASCENDING) {
-            nextBatch = cryptoDao.getCryptosLikeOrderByPriceChangePercentageAsc(limit, offset, text)
+            cryptosFromDb = cryptoDao.getCryptosByIdsOrderByPriceChangePercentageAsc(ids)
         } else if (currentOrder?.first == SortField.PRICE_CHANGE && currentOrder.second == SortOrder.DESCENDING) {
-            nextBatch = cryptoDao.getCryptosLikeOrderByPriceChangePercentageDsc(limit, offset, text)
+            cryptosFromDb = cryptoDao.getCryptosByIdsOrderByPriceChangePercentageDsc(ids)
         }
         else if (currentOrder?.first == SortField.MARKET_CAP && currentOrder.second == SortOrder.ASCENDING) {
-            nextBatch = cryptoDao.getCryptosLikeOrderByMarketCapAsc(limit, offset, text)
+            cryptosFromDb = cryptoDao.getCryptosByIdsOrderByMarketCapAsc(ids)
         } else if (currentOrder?.first == SortField.MARKET_CAP && currentOrder.second == SortOrder.DESCENDING) {
-            nextBatch = cryptoDao.getCryptosLikeOrderByMarketCapDsc(limit, offset, text)
+            cryptosFromDb = cryptoDao.getCryptosByIdsOrderByMarketCapDsc(ids)
         }
-        return nextBatch
+        return cryptosFromDb
     }
 
     fun addToFavourites(id: String) {
         viewModelScope.launch {
             PreferencesDataStore.addToFavorites(appContext, id)
+
+            // scalable, slow
+            val favourites = PreferencesDataStore.getFavoriteIds(appContext).first().toList()
+            _cryptos.postValue(fetchFavouritesFromDb(favourites))
+
+            // not scalable, faster
+            // _cryptos.postValue(_cryptos.value?.plus(fetchFavouritesFromDb(listOf(id))))
         }
     }
 
