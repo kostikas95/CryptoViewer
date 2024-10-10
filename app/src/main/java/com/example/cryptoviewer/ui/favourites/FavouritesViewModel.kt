@@ -2,6 +2,7 @@ package com.example.cryptoviewer.ui.favourites
 
 import android.app.Application
 import android.util.Log
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,6 +12,7 @@ import com.example.cryptoviewer.database.CryptoDatabase
 import com.example.cryptoviewer.database.SortField
 import com.example.cryptoviewer.database.SortOrder
 import com.example.cryptoviewer.model.CryptoCurrency
+import com.example.cryptoviewer.network.ApiVsCurrency
 import com.example.cryptoviewer.network.CryptoApiService
 import com.example.cryptoviewer.network.RetrofitInstance
 import com.example.cryptoviewer.preferences.PreferencesDataStore
@@ -37,6 +39,10 @@ class FavouritesViewModel(application: Application) : AndroidViewModel(applicati
     )
     // val order: LiveData<Pair<SortField, SortOrder>> = _order
 
+    val lazyListState: LazyListState by lazy {
+        LazyListState()
+    }
+
     private var batchJob: Job? = null
 
     fun debug() {
@@ -49,6 +55,11 @@ class FavouritesViewModel(application: Application) : AndroidViewModel(applicati
         Log.d("ViewModel", "ViewModel initialized")
         viewModelScope.launch {
             PreferencesDataStore.getFavoriteIds(appContext).collect { favourites ->
+                // val fetched : List<CryptoCurrency> = cryptoApi.fetchCryptos(
+                //     vsCurrency = ApiVsCurrency.USD,
+                //     ids = favourites.joinToString(", ")
+                // )
+                // cryptoDao.insertCryptos(fetched)
                 _cryptos.postValue(fetchFavouritesFromDb(favourites.toList()))
             }
         }

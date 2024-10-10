@@ -1,5 +1,4 @@
 [versions]
-accompanistSvgVersion = "<latest-version>"
 agp = "8.6.0"
 coilComposeVersion = "2.7.0"
 converterGson = "2.9.0"
@@ -30,7 +29,6 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilComposeVersion" }
 coil-svg = { module = "io.coil-kt:coil-svg", version.ref = "coilComposeVersion" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
-google-accompanist-svg = { module = "com.google.accompanist:accompanist-svg", version.ref = "accompanistSvgVersion" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

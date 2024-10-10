@@ -2,6 +2,7 @@ package com.example.cryptoviewer.ui.search
 
 import android.app.Application
 import android.util.Log
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -36,10 +37,14 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     var searchText = mutableStateOf("")
         private set
 
+    val lazyListState: LazyListState by lazy {
+        LazyListState()
+    }
+
     private var searchJob: Job? = null
     private var batchJob: Job? = null
     private var batchesProjected: Int = 0
-    private var perDbQuery = 50
+    private var perDbQuery = 20
 
     fun debug() {
         Log.d("ViewModel", "navigated back to SearchScreen")

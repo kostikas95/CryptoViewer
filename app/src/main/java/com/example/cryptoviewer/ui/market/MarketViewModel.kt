@@ -2,6 +2,7 @@ package com.example.cryptoviewer.ui.market
 
 import android.app.Application
 import android.util.Log
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -36,10 +37,14 @@ class MarketViewModel(application: Application) : AndroidViewModel(application) 
     )
     // val order: LiveData<Pair<SortField, SortOrder>> = _order
 
+    val lazyListState: LazyListState by lazy {
+        LazyListState()
+    }
+
     private var batchesFetched: Int = 0
-    private var perApiCall: Int = 100
+    private var perApiCall: Int = 250
     private var batchesProjected: Int = 0
-    private var perDbQuery = 50
+    private var perDbQuery = 20
 
     fun debug() {
         Log.d("ViewModel", "navigated back to MarketScreen")
@@ -51,10 +56,10 @@ class MarketViewModel(application: Application) : AndroidViewModel(application) 
 
     init {
         Log.d("ViewModel", "ViewModel initialized")
-        fetchAllCryptoFromApi()
+        fetchAllCryptosFromApi()
     }
 
-    private fun fetchAllCryptoFromApi() {
+    private fun fetchAllCryptosFromApi() {
         viewModelScope.launch {
             while (true) {
                 try {

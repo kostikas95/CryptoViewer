@@ -61,9 +61,8 @@ fun FavouritesScreen(
     val viewModel: FavouritesViewModel = viewModel(viewModelStoreOwner)
     viewModel.debug()
 
-    // states and data
-    val cryptos by viewModel.cryptos.observeAsState(emptyList())
-    val lazyListState = rememberLazyListState(0)
+    // states
+    // val lazyListState = rememberLazyListState(0)
     // val order by viewModel.order.observeAsState(Pair(SortField.MARKET_CAP_RANK, SortOrder.ASCENDING))
 
     // lambdas
@@ -80,8 +79,8 @@ fun FavouritesScreen(
         floatingActionButton = { AutoScrollToTopButton() },
         content = { innerPadding ->
             Content(innerPadding,
-                cryptos,
-                lazyListState,
+                viewModel,
+                // lazyListState,
                 onSortingFactorTextClick,
                 onListItemClicked
             )
@@ -124,18 +123,19 @@ fun AutoScrollToTopButton() {
 @Composable
 fun Content(
     innerPadding: PaddingValues,
-    cryptos: List<CryptoCurrency>,
-    lazyListState: LazyListState,
+    viewModel: FavouritesViewModel,
+    // lazyListState: LazyListState,
     onSortingFactorTextClick: (SortField) -> Unit,
     onListItemClicked: (String) -> Unit
 ) {
-
+    val lazyListState = viewModel.lazyListState
     Column(
         modifier = Modifier.fillMaxSize()
             .padding(innerPadding)
     ) {
         ScrollListHeadline(onSortingFactorTextClick)
 
+        val cryptos by viewModel.cryptos.observeAsState(emptyList())
         LazyColumn(
             state = lazyListState,
             modifier = Modifier.background(Color.Blue)

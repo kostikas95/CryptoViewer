@@ -2,10 +2,7 @@ package com.example.cryptoviewer.ui.search
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -26,11 +23,8 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelStoreOwner
@@ -38,8 +32,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.cryptoviewer.R
 import com.example.cryptoviewer.database.SortField
-import com.example.cryptoviewer.model.CryptoCurrency
-import com.example.cryptoviewer.ui.market.MarketViewModel
 import com.example.cryptoviewer.ui.reusables.BottomBar
 import com.example.cryptoviewer.ui.reusables.ListItem
 import com.example.cryptoviewer.ui.reusables.ScrollListHeadline
@@ -52,8 +44,7 @@ fun SearchScreen(
     val viewModel: SearchViewModel = viewModel(viewModelStoreOwner)
     viewModel.debug()
 
-    // states and data
-    val cryptos by viewModel.cryptos.observeAsState(emptyList())
+    // states
     val lazyListState = rememberLazyListState(0)
     val searchText by viewModel.searchText
 
@@ -75,8 +66,8 @@ fun SearchScreen(
             Content(
                 innerPadding,
                 searchText,
-                cryptos,
-                lazyListState,
+                viewModel,
+                // lazyListState,
                 onSortingFactorTextClick,
                 onSearchTextChanged,
                 onListItemClicked
@@ -116,12 +107,13 @@ fun TopBar(
 fun Content(
     innerPadding: PaddingValues,
     searchText: String,
-    cryptos: List<CryptoCurrency>,
-    lazyListState: LazyListState,
+    viewModel:  SearchViewModel,
+    // lazyListState: LazyListState,
     onSortingFactorTextClick: (SortField) -> Unit,
     onSearchTextChanged: (String) -> Unit,
     onListItemClicked: (String) ->Unit
 ) {
+    val lazyListState = viewModel.lazyListState
     Column(
         modifier = Modifier.fillMaxSize()
             .padding(innerPadding)
@@ -136,6 +128,7 @@ fun Content(
 
         ScrollListHeadline(onSortingFactorTextClick)
 
+        val cryptos by viewModel.cryptos.observeAsState(emptyList())
         LazyColumn(
             state = lazyListState,
             modifier = Modifier.background(Color.Blue)
