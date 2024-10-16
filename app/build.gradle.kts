@@ -64,6 +64,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    // implementation(libs.androidx.material)
+
 
     // view model
     implementation(libs.lifecycle.viewmodel.ktx)
@@ -81,7 +83,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     kapt(libs.androidx.room.compiler)
     // ksp(libs.androidx.room.compiler) // for annotation processing // ksp or kapt?
-    implementation(libs.androidx.room.ktx) // Kotlin Extensions and Coroutines support for Room
+    implementation(libs.androidx.room.ktx)
 
     // navigation
     implementation(libs.androidx.navigation.compose)

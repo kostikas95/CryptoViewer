@@ -11,9 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -45,7 +43,6 @@ fun SearchScreen(
     viewModel.debug()
 
     // states
-    val lazyListState = rememberLazyListState(0)
     val searchText by viewModel.searchText
 
     // lambdas
@@ -67,7 +64,6 @@ fun SearchScreen(
                 innerPadding,
                 searchText,
                 viewModel,
-                // lazyListState,
                 onSortingFactorTextClick,
                 onSearchTextChanged,
                 onListItemClicked
@@ -108,7 +104,6 @@ fun Content(
     innerPadding: PaddingValues,
     searchText: String,
     viewModel:  SearchViewModel,
-    // lazyListState: LazyListState,
     onSortingFactorTextClick: (SortField) -> Unit,
     onSearchTextChanged: (String) -> Unit,
     onListItemClicked: (String) ->Unit
