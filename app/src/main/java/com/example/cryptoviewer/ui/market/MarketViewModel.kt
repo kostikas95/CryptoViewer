@@ -3,6 +3,12 @@ package com.example.cryptoviewer.ui.market
 import android.app.Application
 import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material3.BottomSheetScaffoldState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -12,11 +18,15 @@ import com.example.cryptoviewer.database.CryptoDatabase
 import com.example.cryptoviewer.database.SortField
 import com.example.cryptoviewer.database.SortOrder
 import com.example.cryptoviewer.model.CryptoCurrency
+import com.example.cryptoviewer.model.CustomSheetState
 import com.example.cryptoviewer.network.ApiVsCurrency
 import com.example.cryptoviewer.network.CryptoApiService
 import com.example.cryptoviewer.network.RetrofitInstance
 import com.example.cryptoviewer.preferences.PreferencesDataStore
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -37,9 +47,12 @@ class MarketViewModel(application: Application) : AndroidViewModel(application) 
     )
     // val order: LiveData<Pair<SortField, SortOrder>> = _order
 
+    var customSheetState by mutableStateOf<CustomSheetState>(CustomSheetState.CurrencyConversion)
     val lazyListState: LazyListState by lazy {
         LazyListState()
     }
+    private val _isFabVisible = MutableStateFlow(false)
+    val isFabVisible: StateFlow<Boolean> = _isFabVisible.asStateFlow()
 
     private var batchesFetched: Int = 0
     private var perApiCall: Int = 250
@@ -52,6 +65,16 @@ class MarketViewModel(application: Application) : AndroidViewModel(application) 
         Log.d("ViewModel", "order by ${_order.value?.first} ${_order.value?.second}")
         Log.d("ViewModel", "batches fetched:   ${batchesFetched}")
         Log.d("ViewModel", "batches projected: ${batchesProjected}")
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    fun debugScaffoldState(scaffoldState: BottomSheetScaffoldState) {
+        Log.d("sheet", "currentValue: ${scaffoldState.bottomSheetState.currentValue}")
+        Log.d("sheet", "targetValue: ${scaffoldState.bottomSheetState.targetValue}")
+        Log.d("sheet", "hasExpandedState: ${scaffoldState.bottomSheetState.hasExpandedState}")
+        Log.d("sheet", "hasPartiallyExpandedState: ${scaffoldState.bottomSheetState.hasPartiallyExpandedState}")
+        Log.d("sheet", "isVisible: ${scaffoldState.bottomSheetState.isVisible}")
+        Log.d("sheet", "")
     }
 
     init {
@@ -170,4 +193,25 @@ class MarketViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
+    fun monitorLazyListState() = snapshotFlow { lazyListState.firstVisibleItemIndex }
+
+    fun updateFabVisibility(isVisible: Boolean) {
+        _isFabVisible.value = isVisible
+    }
+
+    suspend fun scrollToTop() {
+        lazyListState.animateScrollToItem(0)
+    }
+
+    suspend fun showCryptoDetails(cryptoId: String) {
+        customSheetState = CustomSheetState.CryptoDetails(cryptoId)
+    }
+
+    suspend fun showCurrencyConversion() {
+        customSheetState = CustomSheetState.CurrencyConversion
+    }
+
+    suspend fun showTimeComparison() {
+        customSheetState = CustomSheetState.TimeComparison
+    }
 }
