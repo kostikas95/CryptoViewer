@@ -1,10 +1,8 @@
 package com.example.cryptoviewer.ui.market
 
-import android.graphics.drawable.Icon
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
@@ -23,16 +21,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -40,7 +31,6 @@ import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -63,11 +53,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.cryptoviewer.R
 import com.example.cryptoviewer.database.SortField
+import com.example.cryptoviewer.ui.reusables.AutoScrollToTopFAB
 import com.example.cryptoviewer.ui.reusables.BottomBar
 import com.example.cryptoviewer.ui.reusables.CustomBottomSheet
-import com.example.cryptoviewer.ui.reusables.ListItem
-import com.example.cryptoviewer.ui.reusables.ScrollListHeadline
-import kotlinx.coroutines.flow.filter
+import com.example.cryptoviewer.ui.reusables.ScrollableList
 import kotlinx.coroutines.launch
 
 
@@ -77,7 +66,7 @@ fun MarketScreen(
     navController: NavHostController,
     viewModelStoreOwner: ViewModelStoreOwner
 ) {
-    val viewModel: MarketViewModel = viewModel(viewModelStoreOwner)
+    val viewModel: MarketScreenViewModel = viewModel(viewModelStoreOwner)
 
 
     // states
@@ -88,7 +77,7 @@ fun MarketScreen(
             skipHiddenState = false
         )
     )
-
+    val cryptos by viewModel.cryptos.observeAsState(emptyList())
     val expandedSheetHeight = LocalConfiguration.current.screenHeightDp.dp * 0.8f
     val isFabVisible by viewModel.isFabVisible.collectAsState()
     var isBottomBarVisible by remember { mutableStateOf(true) }
@@ -97,6 +86,9 @@ fun MarketScreen(
     val scope = rememberCoroutineScope()
 
     // lambdas
+    val onLoadNextPage : () -> Unit = {
+        viewModel.loadNextPage()
+    }
     val onSortingFactorTextClick : (SortField) -> Unit = { newField ->
         viewModel.changeOrder(newField)
     }
@@ -118,12 +110,27 @@ fun MarketScreen(
 
         }
     }
+    val onScrollToTop: () -> Unit = {
+        scope.launch {
+            viewModel.scrollToTop()
+        }
+    }
+    // val checkIfFavourite: (String) -> Unit = { cryptoId ->
+    //     viewModel.checkIfFavourite(cryptoId)
+    // }
+    // val onToggleFavourite : (String) -> Unit = { cryptoId ->
+    //     viewModel.toggleFavourite(cryptoId)
+    // }
 
     val animatedTopBarHeight by animateDpAsState(
         targetValue = topBarHeight,
         animationSpec = tween(durationMillis = 1200),
         label = ""
     )
+
+    LaunchedEffect(Unit) {
+        topBarHeight = 150.dp // Reset to full height when entering the screen
+    }
 
     LaunchedEffect(key1 = Unit) {
         viewModel.monitorLazyListState().collect { firstIndex ->
@@ -155,27 +162,19 @@ fun MarketScreen(
                     isBottomBarVisible = false
                 }
 
+                if (currentIndex == 0) {
+                    topBarHeight = 150.dp
+                } else if (currentIndex in 1..2) {
+                    val shrinkFactor = currentIndex / 2f
+                    topBarHeight = lerp(150.dp, 65.dp, shrinkFactor)
+                } else {
+                    topBarHeight = 65.dp
+                }
+
                 previousIndex = currentIndex
                 previousScrollOffset = currentOffset
             }
         }
-    }
-
-    LaunchedEffect(lazyListState) {
-        snapshotFlow { lazyListState.firstVisibleItemIndex }
-            .collect { firstVisibleItemIndex ->
-                // Determine the new height of the top bar based on scroll offset
-                scope.launch {
-                    if (firstVisibleItemIndex == 0) {
-                        topBarHeight = 150.dp
-                    } else if (firstVisibleItemIndex in 1..2) {
-                        val shrinkFactor = firstVisibleItemIndex / 2f
-                        topBarHeight = lerp(150.dp, 65.dp, shrinkFactor)
-                    } else {
-                        topBarHeight = 65.dp
-                    }
-                }
-            }
     }
 
     BottomSheetScaffold(
@@ -205,15 +204,14 @@ fun MarketScreen(
                 TopBar("Market", animatedTopBarHeight)
 
 
-                Box(
-                    modifier = Modifier.weight(8.0f)
-                ) {
-
+                Box {
                     ScrollableList(
                         innerPadding = PaddingValues(0.dp),
-                        viewModel = viewModel,
+                        lazyListState = lazyListState,
+                        cryptos = cryptos,
                         onSortingFactorTextClick = onSortingFactorTextClick,
-                        onListItemClicked = onListItemClicked
+                        onListItemClicked = onListItemClicked,
+                        onLoadNextPage = onLoadNextPage
                     )
 
                     // FAB
@@ -231,18 +229,7 @@ fun MarketScreen(
                             .align(Alignment.BottomEnd)
                             .padding(bottom = 95.dp, end = 50.dp)
                     )  {
-                        FloatingActionButton(
-                            onClick = {
-                                scope.launch {
-                                    viewModel.scrollToTop()
-                                }
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Add,
-                                contentDescription = "Scroll to top"
-                            )
-                        }
+                        AutoScrollToTopFAB(onScrollToTop = onScrollToTop)
                     }
 
                 }
@@ -308,38 +295,5 @@ fun TopBar(
     }
 }
 
-@Composable
-fun ScrollableList(
-    innerPadding: PaddingValues,
-    viewModel: MarketViewModel,
-    onSortingFactorTextClick: (SortField) -> Unit,
-    onListItemClicked: (String) -> Unit
-) {
-    viewModel.debug()
-    val lazyListState = viewModel.lazyListState
-    LaunchedEffect(lazyListState) {
-        snapshotFlow { lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-            .filter { it == lazyListState.layoutInfo.totalItemsCount - 1 }
-            .collect {
-                viewModel.loadNextPage()
-            }
-    }
 
-    Column(
-        modifier = Modifier.fillMaxSize()
-            .padding(innerPadding)
-    ) {
-        ScrollListHeadline(onSortingFactorTextClick)
-
-        val cryptos by viewModel.cryptos.observeAsState(emptyList())
-        LazyColumn(
-            state = viewModel.lazyListState,
-            modifier = Modifier.background(Color.Blue)
-        ) {
-            items(items = cryptos, key = {it.id}) { crypto ->
-                ListItem(crypto, onListItemClicked)
-            }
-        }
-    }
-}
 
