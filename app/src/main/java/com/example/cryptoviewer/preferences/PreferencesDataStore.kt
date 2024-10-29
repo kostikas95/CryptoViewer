@@ -16,7 +16,7 @@ object PreferencesDataStore {
     val Context.dataStore by preferencesDataStore(name = PREFERENCES_NAME)
 
     // favorite IDs
-    fun getFavoriteIds(context: Context): Flow<Set<String>> =
+   fun getFavouriteIds(context: Context): Flow<Set<String>> =
         context.dataStore.data.map { preferences ->
             preferences[FAVORITE_IDS] ?: emptySet()
         }

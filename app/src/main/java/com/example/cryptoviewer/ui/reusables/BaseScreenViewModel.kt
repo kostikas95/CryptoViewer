@@ -16,11 +16,16 @@ import com.example.cryptoviewer.database.SortField
 import com.example.cryptoviewer.database.SortOrder
 import com.example.cryptoviewer.model.CryptoCurrency
 import com.example.cryptoviewer.model.CustomSheetState
+import com.example.cryptoviewer.network.ApiVsCurrency
 import com.example.cryptoviewer.network.CryptoApiService
 import com.example.cryptoviewer.network.RetrofitInstance
+import com.example.cryptoviewer.preferences.PreferencesDataStore
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 abstract class BaseScreenViewModel(application: Application) : AndroidViewModel(application) {
@@ -29,13 +34,29 @@ abstract class BaseScreenViewModel(application: Application) : AndroidViewModel(
     protected val cryptoApi: CryptoApiService = RetrofitInstance.api
     protected val appContext: Application = application
 
+
+
+    protected val _conversionCurrency = MutableStateFlow(ApiVsCurrency.USD)
+    val conversionCurrency: StateFlow<ApiVsCurrency> = _conversionCurrency
+
+    protected val _favouriteIds = MutableStateFlow<Set<String>>(emptySet())
+    val favouriteIds: StateFlow<Set<String>> = _favouriteIds
+
+    protected val _isCryptoFavourite = MutableStateFlow(false)
+    val isCryptoFavourite: StateFlow<Boolean> = _isCryptoFavourite
+
+    init {
+        viewModelScope.launch {
+            PreferencesDataStore.getFavouriteIds(appContext).collect { favouriteIds ->
+                _favouriteIds.value = favouriteIds
+            }
+        }
+    }
+
     protected var batchesProjected: Int = 0
     protected val perDbQuery = 20
-
     protected val _cryptos = MutableLiveData<List<CryptoCurrency>>(emptyList())
     val cryptos: LiveData<List<CryptoCurrency>> = _cryptos
-
-
     protected val _order = MutableLiveData<Pair<SortField, SortOrder>> (
         Pair(SortField.MARKET_CAP_RANK, SortOrder.ASCENDING)
     )
@@ -86,13 +107,40 @@ abstract class BaseScreenViewModel(application: Application) : AndroidViewModel(
 
 
     var customSheetState by mutableStateOf<CustomSheetState>(CustomSheetState.CurrencyConversion)
-    suspend fun showCryptoDetails(cryptoId: String) {
+
+    suspend fun showCryptoDetailsSheet(cryptoId: String) {
         customSheetState = CustomSheetState.CryptoDetails(cryptoId)
     }
-    suspend fun showCurrencyConversion() {
+    fun checkIfFavourite(cryptoId: String) : Boolean {
+        _isCryptoFavourite.value = _favouriteIds.value.contains(cryptoId)
+        return _isCryptoFavourite.value
+    }
+    fun addToFavourites(cryptoId: String) {
+        viewModelScope.launch {
+            PreferencesDataStore.addToFavourites(appContext, cryptoId)
+        }
+    }
+    fun removeFromFavourites(cryptoId: String) {
+        viewModelScope.launch {
+            PreferencesDataStore.removeFromFavourites(appContext, cryptoId)
+        }
+    }
+    // fun toggleFavourite(cryptoId: String) {
+    //     viewModelScope.launch {
+    //         if (checkIfFavourite(cryptoId)) {
+    //             PreferencesDataStore.removeFromFavourites(appContext, cryptoId)
+    //         }
+    //         else {
+    //             PreferencesDataStore.addToFavourites(appContext, cryptoId)
+    //         }
+    //     }
+    // }
+    suspend fun showCurrencyConversionSheet() {
         customSheetState = CustomSheetState.CurrencyConversion
     }
-    suspend fun showTimeComparison() {
+    suspend fun showTimeComparisonSheet() {
         customSheetState = CustomSheetState.TimeComparison
     }
+
+
 }

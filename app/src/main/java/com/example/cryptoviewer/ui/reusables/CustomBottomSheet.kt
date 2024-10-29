@@ -2,55 +2,68 @@ package com.example.cryptoviewer.ui.reusables
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.cryptoviewer.model.CustomSheetState
+import com.example.cryptoviewer.network.ApiVsCurrency
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomBottomSheet(
-    customSheetState: CustomSheetState
+    customSheetState: CustomSheetState,
+    isCryptoFavourite: Boolean,
+    // checkIfFavourite: (String) -> Boolean = { false },
+    toggleFavourite: (String) -> Unit = {},
+    onConversionCurrencyChanged: (ApiVsCurrency) -> Unit = {},
 ) {
-    val scrollState = rememberScrollState()
-
     when (customSheetState) {
         is CustomSheetState.CryptoDetails ->
-            CryptoDetailsSheet(cryptoId = customSheetState.cryptoId)
-        is CustomSheetState.CurrencyConversion -> CurrencyConversionSheet()
+            CryptoDetailsSheet(
+                cryptoId = customSheetState.cryptoId,
+                isCryptoFavourite = isCryptoFavourite,
+                // checkIfFavourite = checkIfFavourite,
+                toggleFavourite = toggleFavourite
+            )
+        is CustomSheetState.CurrencyConversion ->
+            CurrencyConversionSheet(
+                onConversionCurrencyChanged = onConversionCurrencyChanged
+        )
         is CustomSheetState.TimeComparison -> TimeComparisonSheet()
     }
 }
 
 @Composable
 fun CryptoDetailsSheet(
-    cryptoId: String
+    cryptoId: String,
+    isCryptoFavourite: Boolean,
+    // checkIfFavourite: (String) -> Boolean = { false },
+    toggleFavourite: (String) -> Unit = {}
 ) {
+    // val scrollState = rememberScrollState()
     Row {
         Text(text = "Details for Crypto: $cryptoId")
 
         Icon(
-            imageVector = Icons.Filled.FavoriteBorder,
-            contentDescription = "favourite toggle",
+            imageVector = if (isCryptoFavourite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+            contentDescription = if (isCryptoFavourite) "Remove from Favourites" else "Add to Favourites",
+            tint = if (isCryptoFavourite) Color.Red else Color.Gray,
+            modifier = Modifier.clickable {
+                toggleFavourite(cryptoId)
+            }
         )
     }
 }
 
 @Composable
-fun CurrencyConversionSheet() {
+fun CurrencyConversionSheet(
+    onConversionCurrencyChanged: (ApiVsCurrency) -> Unit = {}
+) {
     Text(text = "Choose a currency for conversion")
 }
 

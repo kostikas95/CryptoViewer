@@ -83,6 +83,7 @@ fun MarketScreen(
     var isBottomBarVisible by remember { mutableStateOf(true) }
     var topBarHeight by remember { mutableStateOf(150.dp) }
     val lazyListState = viewModel.lazyListState
+    val isCryptoFavourite by viewModel.isCryptoFavourite.collectAsState()
     val scope = rememberCoroutineScope()
 
     // lambdas
@@ -94,7 +95,7 @@ fun MarketScreen(
     }
     val onListItemClicked : (String) -> Unit = { cryptoId ->
         scope.launch {
-            viewModel.showCryptoDetails(cryptoId)
+            viewModel.showCryptoDetailsSheet(cryptoId)
             scaffoldState.bottomSheetState.expand()
         }
     }
@@ -115,12 +116,12 @@ fun MarketScreen(
             viewModel.scrollToTop()
         }
     }
-    // val checkIfFavourite: (String) -> Unit = { cryptoId ->
-    //     viewModel.checkIfFavourite(cryptoId)
-    // }
-    // val onToggleFavourite : (String) -> Unit = { cryptoId ->
-    //     viewModel.toggleFavourite(cryptoId)
-    // }
+    val checkIfFavourite: (String) -> Boolean = { cryptoId ->
+        viewModel.checkIfFavourite(cryptoId)
+    }
+    val toggleFavourite: (String) -> Unit = { cryptoId ->
+        viewModel.toggleFavourite(cryptoId)
+    }
 
     val animatedTopBarHeight by animateDpAsState(
         targetValue = topBarHeight,
@@ -128,9 +129,6 @@ fun MarketScreen(
         label = ""
     )
 
-    LaunchedEffect(Unit) {
-        topBarHeight = 150.dp // Reset to full height when entering the screen
-    }
 
     LaunchedEffect(key1 = Unit) {
         viewModel.monitorLazyListState().collect { firstIndex ->
@@ -188,7 +186,13 @@ fun MarketScreen(
                     .fillMaxWidth()
                     .height(expandedSheetHeight)
             ) {
-                CustomBottomSheet(customSheetState = viewModel.customSheetState)
+                CustomBottomSheet(
+                    customSheetState = viewModel.customSheetState,
+                    isCryptoFavourite = isCryptoFavourite,
+                    // checkIfFavourite = checkIfFavourite,
+                    toggleFavourite = toggleFavourite,
+                    // onConversionCurrencyChanged = onConversionCurrencyChanged
+                )
             }
         }
     ) { paddingValues ->

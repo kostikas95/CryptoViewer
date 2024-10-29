@@ -81,14 +81,16 @@ fun FavouritesScreen(
     var isBottomBarVisible by remember { mutableStateOf(true) }
     var topBarHeight by remember { mutableStateOf(150.dp) }
     val lazyListState = viewModel.lazyListState
+    val isCryptoFavourite by viewModel.isCryptoFavourite.collectAsState()
     val scope = rememberCoroutineScope()
 
     // lambdas
     val onSortingFactorTextClick : (SortField) -> Unit = { newField ->
         viewModel.changeOrder(newField)
     }
-    val onListItemClicked : (String) -> Unit = { id ->
+    val onListItemClicked : (String) -> Unit = { cryptoId ->
         scope.launch {
+            viewModel.showCryptoDetailsSheet(cryptoId)
             scaffoldState.bottomSheetState.expand()
         }
     }
@@ -108,6 +110,12 @@ fun FavouritesScreen(
         scope.launch {
             viewModel.scrollToTop()
         }
+    }
+    val checkIfFavourite: (String) -> Boolean = { cryptoId ->
+        viewModel.checkIfFavourite(cryptoId)
+    }
+    val toggleFavourite: (String) -> Unit = { cryptoId ->
+        viewModel.toggleFavourite(cryptoId)
     }
 
     val animatedTopBarHeight by animateDpAsState(
@@ -172,7 +180,13 @@ fun FavouritesScreen(
                     .fillMaxWidth()
                     .height(expandedSheetHeight)
             ) {
-                CustomBottomSheet(customSheetState = viewModel.customSheetState)
+                CustomBottomSheet(
+                    customSheetState = viewModel.customSheetState,
+                    isCryptoFavourite = isCryptoFavourite,
+                    // checkIfFavourite = checkIfFavourite,
+                    toggleFavourite = toggleFavourite,
+                    // onConversionCurrencyChanged = onConversionCurrencyChanged
+                )
             }
         }
     ) { paddingValues ->
