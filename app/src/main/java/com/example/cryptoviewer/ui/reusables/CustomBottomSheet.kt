@@ -10,15 +10,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.cryptoviewer.model.CustomSheetState
 import com.example.cryptoviewer.network.ApiVsCurrency
 
 @Composable
 fun CustomBottomSheet(
     customSheetState: CustomSheetState,
-    isCryptoFavourite: Boolean,
-    // checkIfFavourite: (String) -> Boolean = { false },
+    favouriteIds: Set<String> = emptySet(),
     toggleFavourite: (String) -> Unit = {},
     onConversionCurrencyChanged: (ApiVsCurrency) -> Unit = {},
 ) {
@@ -26,8 +24,7 @@ fun CustomBottomSheet(
         is CustomSheetState.CryptoDetails ->
             CryptoDetailsSheet(
                 cryptoId = customSheetState.cryptoId,
-                isCryptoFavourite = isCryptoFavourite,
-                // checkIfFavourite = checkIfFavourite,
+                favouriteIds = favouriteIds,
                 toggleFavourite = toggleFavourite
             )
         is CustomSheetState.CurrencyConversion ->
@@ -41,18 +38,18 @@ fun CustomBottomSheet(
 @Composable
 fun CryptoDetailsSheet(
     cryptoId: String,
-    isCryptoFavourite: Boolean,
-    // checkIfFavourite: (String) -> Boolean = { false },
+    favouriteIds: Set<String>,
     toggleFavourite: (String) -> Unit = {}
 ) {
     // val scrollState = rememberScrollState()
+    val isFavourite = favouriteIds.contains(cryptoId)
     Row {
         Text(text = "Details for Crypto: $cryptoId")
 
         Icon(
-            imageVector = if (isCryptoFavourite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-            contentDescription = if (isCryptoFavourite) "Remove from Favourites" else "Add to Favourites",
-            tint = if (isCryptoFavourite) Color.Red else Color.Gray,
+            imageVector = if (isFavourite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+            contentDescription = if (isFavourite) "Remove from Favourites" else "Add to Favourites",
+            tint = if (isFavourite) Color.Red else Color.Gray,
             modifier = Modifier.clickable {
                 toggleFavourite(cryptoId)
             }

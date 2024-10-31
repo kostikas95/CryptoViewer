@@ -1,6 +1,7 @@
 package com.example.cryptoviewer.ui.reusables
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,33 +35,45 @@ abstract class BaseScreenViewModel(application: Application) : AndroidViewModel(
     protected val cryptoApi: CryptoApiService = RetrofitInstance.api
     protected val appContext: Application = application
 
-
-
-    protected val _conversionCurrency = MutableStateFlow(ApiVsCurrency.USD)
-    val conversionCurrency: StateFlow<ApiVsCurrency> = _conversionCurrency
-
-    protected val _favouriteIds = MutableStateFlow<Set<String>>(emptySet())
-    val favouriteIds: StateFlow<Set<String>> = _favouriteIds
-
-    protected val _isCryptoFavourite = MutableStateFlow(false)
-    val isCryptoFavourite: StateFlow<Boolean> = _isCryptoFavourite
-
-    init {
-        viewModelScope.launch {
-            PreferencesDataStore.getFavouriteIds(appContext).collect { favouriteIds ->
-                _favouriteIds.value = favouriteIds
-            }
-        }
-    }
-
     protected var batchesProjected: Int = 0
     protected val perDbQuery = 20
+
+    val favouriteIds: StateFlow<Set<String>> = PreferencesDataStore.favouriteIds
+    val conversionCurrency: StateFlow<ApiVsCurrency> = PreferencesDataStore.conversionCurrency
+
     protected val _cryptos = MutableLiveData<List<CryptoCurrency>>(emptyList())
-    val cryptos: LiveData<List<CryptoCurrency>> = _cryptos
+    val cryptos: LiveData<List<CryptoCurrency>> get() = _cryptos
     protected val _order = MutableLiveData<Pair<SortField, SortOrder>> (
         Pair(SortField.MARKET_CAP_RANK, SortOrder.ASCENDING)
     )
-    // val order: LiveData<Pair<SortField, SortOrder>> = _order
+    // val order: LiveData<Pair<SortField, SortOrder>> get() = _order
+
+    val lazyListState: LazyListState by lazy {
+        LazyListState()
+    }
+
+    private val _isFabVisible = MutableStateFlow(false)
+    val isFabVisible: StateFlow<Boolean> = _isFabVisible.asStateFlow()
+
+    var customSheetState by mutableStateOf<CustomSheetState>(CustomSheetState.CurrencyConversion)
+
+
+    fun isCryptoFavourite(cryptoId: String): Boolean {
+        return PreferencesDataStore.isCryptoFavourite(cryptoId)
+    }
+    fun toggleFavouriteStatus(cryptoId: String) {
+        viewModelScope.launch {
+            PreferencesDataStore.toggleFavouriteStatus(appContext, cryptoId)
+            Log.d("favourites", "base view model: ${favouriteIds.value}")
+        }
+    }
+
+    fun setConversionCurrency(newCurrency: ApiVsCurrency) {
+        viewModelScope.launch {
+            PreferencesDataStore.setConversionCurrency(appContext, newCurrency)
+        }
+    }
+
     fun changeOrder(newField : SortField) {
         val currentOrder : Pair<SortField, SortOrder>? = _order.value
         if (currentOrder == null) _order.postValue(Pair(newField, SortOrder.ASCENDING))
@@ -84,57 +97,18 @@ abstract class BaseScreenViewModel(application: Application) : AndroidViewModel(
         }
     }
 
-
-
-
-    val lazyListState: LazyListState by lazy {
-        LazyListState()
-    }
     fun monitorLazyListState() = snapshotFlow { lazyListState.firstVisibleItemIndex }
     suspend fun scrollToTop() {
         lazyListState.animateScrollToItem(0)
     }
 
-
-
-
-    private val _isFabVisible = MutableStateFlow(false)
-    val isFabVisible: StateFlow<Boolean> = _isFabVisible.asStateFlow()
     fun updateFabVisibility(isVisible: Boolean) {
         _isFabVisible.value = isVisible
     }
 
-
-
-    var customSheetState by mutableStateOf<CustomSheetState>(CustomSheetState.CurrencyConversion)
-
     suspend fun showCryptoDetailsSheet(cryptoId: String) {
         customSheetState = CustomSheetState.CryptoDetails(cryptoId)
     }
-    fun checkIfFavourite(cryptoId: String) : Boolean {
-        _isCryptoFavourite.value = _favouriteIds.value.contains(cryptoId)
-        return _isCryptoFavourite.value
-    }
-    fun addToFavourites(cryptoId: String) {
-        viewModelScope.launch {
-            PreferencesDataStore.addToFavourites(appContext, cryptoId)
-        }
-    }
-    fun removeFromFavourites(cryptoId: String) {
-        viewModelScope.launch {
-            PreferencesDataStore.removeFromFavourites(appContext, cryptoId)
-        }
-    }
-    // fun toggleFavourite(cryptoId: String) {
-    //     viewModelScope.launch {
-    //         if (checkIfFavourite(cryptoId)) {
-    //             PreferencesDataStore.removeFromFavourites(appContext, cryptoId)
-    //         }
-    //         else {
-    //             PreferencesDataStore.addToFavourites(appContext, cryptoId)
-    //         }
-    //     }
-    // }
     suspend fun showCurrencyConversionSheet() {
         customSheetState = CustomSheetState.CurrencyConversion
     }

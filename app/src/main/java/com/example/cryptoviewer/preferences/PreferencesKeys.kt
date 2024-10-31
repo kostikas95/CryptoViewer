@@ -5,7 +5,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 
 object PreferencesKeys {
-    val FAVORITE_IDS = stringSetPreferencesKey("favorite_ids")
+    val FAVOURITE_IDS = stringSetPreferencesKey("favorite_ids")
     val CONVERSION_CURRENCY = stringPreferencesKey("conversion_currency")
     val COMPARISON_TIME = stringPreferencesKey("comparison_time")
     val THEME_MODE = stringPreferencesKey("theme_mode")

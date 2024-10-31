@@ -82,8 +82,8 @@ fun MarketScreen(
     val isFabVisible by viewModel.isFabVisible.collectAsState()
     var isBottomBarVisible by remember { mutableStateOf(true) }
     var topBarHeight by remember { mutableStateOf(150.dp) }
+    val favouriteIds by viewModel.favouriteIds.collectAsState()
     val lazyListState = viewModel.lazyListState
-    val isCryptoFavourite by viewModel.isCryptoFavourite.collectAsState()
     val scope = rememberCoroutineScope()
 
     // lambdas
@@ -116,11 +116,8 @@ fun MarketScreen(
             viewModel.scrollToTop()
         }
     }
-    val checkIfFavourite: (String) -> Boolean = { cryptoId ->
-        viewModel.checkIfFavourite(cryptoId)
-    }
     val toggleFavourite: (String) -> Unit = { cryptoId ->
-        viewModel.toggleFavourite(cryptoId)
+        viewModel.toggleFavouriteStatus(cryptoId)
     }
 
     val animatedTopBarHeight by animateDpAsState(
@@ -188,10 +185,8 @@ fun MarketScreen(
             ) {
                 CustomBottomSheet(
                     customSheetState = viewModel.customSheetState,
-                    isCryptoFavourite = isCryptoFavourite,
-                    // checkIfFavourite = checkIfFavourite,
+                    favouriteIds = favouriteIds,
                     toggleFavourite = toggleFavourite,
-                    // onConversionCurrencyChanged = onConversionCurrencyChanged
                 )
             }
         }
