@@ -1,6 +1,7 @@
 package com.example.cryptoviewer.network
 
 import com.example.cryptoviewer.model.CryptoCurrency
+import com.example.cryptoviewer.model.SearchResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -16,4 +17,12 @@ interface CryptoApiService {
         @Query("price_change_percentage") priceChangePercentage : String = "24h",
         @Query("precision") precision : String = "3"
     ) : List<CryptoCurrency>
+
+    @GET("search")
+    suspend fun fetchRelativeCoinIds(
+        @Query("id") id: String
+    ) : SearchResponse
+
+    @GET("search/trending")
+    suspend fun fetchTrendingCoinIds() : SearchResponse
 }

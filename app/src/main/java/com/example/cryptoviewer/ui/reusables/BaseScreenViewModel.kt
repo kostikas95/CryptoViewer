@@ -35,7 +35,7 @@ abstract class BaseScreenViewModel(application: Application) : AndroidViewModel(
     protected val cryptoApi: CryptoApiService = RetrofitInstance.api
     protected val appContext: Application = application
 
-    protected var batchesProjected: Int = 0
+    protected var offset: Int = 0
     protected val perDbQuery = 20
 
     val favouriteIds: StateFlow<Set<String>> = PreferencesDataStore.favouriteIds
@@ -85,7 +85,7 @@ abstract class BaseScreenViewModel(application: Application) : AndroidViewModel(
         else _order.postValue(Pair(newField, SortOrder.DESCENDING))
 
         _cryptos.postValue(emptyList())
-        batchesProjected = 0
+        offset = 0
         viewModelScope.launch {
             loadNextPageSuspend()
         }
