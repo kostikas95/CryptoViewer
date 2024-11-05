@@ -192,6 +192,7 @@ fun MarketScreen(
                     customSheetState = viewModel.customSheetState,
                     favouriteIds = favouriteIds,
                     toggleFavourite = toggleFavourite,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }
@@ -210,12 +211,12 @@ fun MarketScreen(
 
                 Box {
                     ScrollableList(
-                        innerPadding = PaddingValues(0.dp),
                         lazyListState = lazyListState,
                         cryptos = cryptos,
                         onSortingFactorTextClick = onSortingFactorTextClick,
                         onListItemClicked = onListItemClicked,
-                        onLoadNextPage = onLoadNextPage
+                        onLoadNextPage = onLoadNextPage,
+                        modifier = Modifier.fillMaxWidth().padding(start = 8.dp, end = 8.dp)
                     )
 
                     // FAB
@@ -251,7 +252,10 @@ fun MarketScreen(
                 ),
                 modifier = Modifier.align(Alignment.BottomCenter)
             ) {
-                BottomBar(navController)
+                BottomBar(
+                    navController = navController,
+                    modifier = Modifier.fillMaxWidth().height(60.dp)
+                )
             }
 
 

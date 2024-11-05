@@ -95,6 +95,9 @@ dependencies {
     // datastore
     implementation(libs.androidx.datastore.preferences)
 
+    // constraint layout compose
+    implementation(libs.androidx.constraintlayout.compose)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

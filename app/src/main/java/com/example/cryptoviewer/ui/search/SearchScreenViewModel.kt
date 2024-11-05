@@ -52,6 +52,12 @@ class SearchScreenViewModel(application: Application) : AndroidViewModel(applica
         Pair(SortField.MARKET_CAP_RANK, SortOrder.ASCENDING)
     )
     // val order: LiveData<Pair<SortField, SortOrder>> get() = _order
+    // protected val _pricesChartData = MutableLiveData<List<Double>>(emptyList())
+    // val pricesChartData : LiveData<List<Double>> get() = _pricesChartData
+    // protected val _volumesChartData = MutableLiveData<List<Double>>(emptyList())
+    // val volumesChartData : LiveData<List<Double>> get() = _volumesChartData
+    // protected val _marketCapsChartData = MutableLiveData<List<Double>>(emptyList())
+    // val marketCapsChartData : LiveData<List<Double>> get() = _marketCapsChartData
 
     val lazyListState: LazyListState by lazy {
         LazyListState()
@@ -106,7 +112,13 @@ class SearchScreenViewModel(application: Application) : AndroidViewModel(applica
     }
 
     suspend fun showCryptoDetailsSheet(cryptoId: String) {
-        customSheetState = CustomSheetState.CryptoDetails(cryptoId)
+        val cryptoChartData = cryptoApi.getCryptoChartData(
+            id = cryptoId,
+            vsCurrency = ApiVsCurrency.USD,
+            days = "30"
+            )
+        val cryptoCurrency = cryptoDao.getCryptoById(cryptoId)
+        customSheetState = CustomSheetState.CryptoDetails(cryptoId, cryptoCurrency, cryptoChartData)
     }
     suspend fun showCurrencyConversionSheet() {
         customSheetState = CustomSheetState.CurrencyConversion

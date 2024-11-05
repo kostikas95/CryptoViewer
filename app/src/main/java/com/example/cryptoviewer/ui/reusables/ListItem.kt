@@ -28,17 +28,19 @@ import java.util.Locale
 @Composable
 fun ListItem(
     crypto: CryptoCurrency,
-    onClick: (String) -> Unit
+    onListItemClicked: (String) -> Unit,
+    modifier: Modifier
 ) {
 
     val painter = rememberAsyncImagePainter(crypto.imageUrl)
+
     Row(
-        modifier = Modifier.padding(8.dp)
-            .fillMaxWidth(1f)
+        modifier = modifier
+            .padding(3.dp)
             .height(72.dp)
             .border(1.dp, Color.Red)
             .clickable {
-                onClick(crypto.id)
+                onListItemClicked(crypto.id)
             },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween

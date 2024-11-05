@@ -11,7 +11,13 @@ interface CryptoCurrencyDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCryptos(cryptos: List<CryptoCurrency>)
 
-    // --------------------------------- EXPLORE SCREEN -------------------------------------------
+    // _____________________________________________________________________________________________
+
+    // get a single crypto by id
+    @Query("SELECT * FROM cryptocurrencies WHERE id = :cryptoId LIMIT 1")
+    suspend fun getCryptoById(cryptoId: String): CryptoCurrency
+
+    // _____________________________________________________________________________________________
 
     // order by market cap rank
     @Query("SELECT * FROM cryptocurrencies ORDER BY marketCapRank ASC LIMIT :limit OFFSET :offset")
@@ -63,7 +69,8 @@ interface CryptoCurrencyDao {
     suspend fun getCryptosOrderByMarketCapDsc(limit: Int, offset: Int): List<CryptoCurrency>
 
 
-    // ---------------------------------- SEARCH SCREEN --------------------------------------------
+    // _____________________________________________________________________________________________
+
     // order by market cap rank
     @Query("""
         SELECT * FROM cryptocurrencies
@@ -191,7 +198,8 @@ interface CryptoCurrencyDao {
     suspend fun getRelativeCryptosOrderByMarketCapDsc(limit: Int, offset: Int, text: String): List<CryptoCurrency>
 
 
-    // -------------------------------- FAVOURITES SCREEN ------------------------------------------
+    // _____________________________________________________________________________________________
+
     // order by market cap rank
     @Query("""
         SELECT * FROM cryptocurrencies
@@ -294,7 +302,7 @@ interface CryptoCurrencyDao {
     """)
     suspend fun getCryptosByIdsOrderByMarketCapDsc(limit: Int, offset: Int, ids: List<String>): List<CryptoCurrency>
 
-
+    // _____________________________________________________________________________________________
 
 
 

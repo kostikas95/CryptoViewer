@@ -181,6 +181,7 @@ fun FavouritesScreen(
                     customSheetState = viewModel.customSheetState,
                     favouriteIds = favouriteIds,
                     toggleFavourite = toggleFavourite,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }
@@ -197,11 +198,11 @@ fun FavouritesScreen(
 
                 Box {
                     ScrollableList(
-                        innerPadding = PaddingValues(0.dp),
                         lazyListState = lazyListState,
                         cryptos = cryptos,
                         onSortingFactorTextClick = onSortingFactorTextClick,
-                        onListItemClicked = onListItemClicked
+                        onListItemClicked = onListItemClicked,
+                        modifier = Modifier.fillMaxWidth().padding(start = 8.dp, end = 8.dp)
                     )
 
                     // FAB
@@ -235,7 +236,10 @@ fun FavouritesScreen(
                 ),
                 modifier = Modifier.align(Alignment.BottomCenter)
             ) {
-                BottomBar(navController)
+                BottomBar(
+                    navController = navController,
+                    modifier = Modifier.fillMaxWidth().height(60.dp)
+                )
             }
 
             if (scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded) {

@@ -107,7 +107,13 @@ abstract class BaseScreenViewModel(application: Application) : AndroidViewModel(
     }
 
     suspend fun showCryptoDetailsSheet(cryptoId: String) {
-        customSheetState = CustomSheetState.CryptoDetails(cryptoId)
+        val cryptoChartData = cryptoApi.getCryptoChartData(
+            id = cryptoId,
+            vsCurrency = ApiVsCurrency.USD,
+            days = "30"
+        )
+        val cryptoCurrency = cryptoDao.getCryptoById(cryptoId)
+        customSheetState = CustomSheetState.CryptoDetails(cryptoId, cryptoCurrency, cryptoChartData)
     }
     suspend fun showCurrencyConversionSheet() {
         customSheetState = CustomSheetState.CurrencyConversion

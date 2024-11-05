@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
@@ -34,7 +32,8 @@ import com.example.cryptoviewer.navigation.Search
 
 @Composable
 fun BottomBar(
-    navController: NavHostController
+    navController: NavHostController,
+    modifier: Modifier
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -44,9 +43,7 @@ fun BottomBar(
     }
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth(1f)
-            .height(60.dp)
+        modifier = modifier
             .background(Color.White),
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
@@ -97,8 +94,8 @@ fun TabIcon(
         Image(
             painter = painterResource(id = iconResId),
             contentDescription = null,
-            colorFilter = ColorFilter.tint(strokeColor), // Tinting the icon
-            modifier = Modifier.size(32.dp) // Set icon size
+            colorFilter = ColorFilter.tint(strokeColor),
+            modifier = Modifier.size(32.dp)
         )
     }
 }
