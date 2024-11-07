@@ -33,6 +33,6 @@ interface CryptoApiService {
         @Path("id") id : String,
         @Query("vs_currency") vsCurrency : ApiVsCurrency,
         @Query("days") days : String,
-        @Query("interval") interval : String? = null
+        @Query("interval") interval : String? = "daily"
     ) : CryptoChartData
 }

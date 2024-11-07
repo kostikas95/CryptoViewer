@@ -1,5 +1,10 @@
 package com.example.cryptoviewer
 
+import android.util.Log
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+
 fun formatNumberForDisplay(value: Double, maxLength: Int): String {
     return when {
         // very small numbers
@@ -27,3 +32,35 @@ fun formatNumberForDisplay(value: Long): String {
         else -> value.toString()                                                           // Less than 1K, no abbreviation
     }
 }
+
+fun formatTimestampDouble(timestamp: Double): String {
+    val formatter = DateTimeFormatter.ofPattern("dd MMM")
+    val date = Instant.ofEpochMilli(timestamp.toLong())
+        .atZone(ZoneId.systemDefault())
+        .toLocalDate()
+    Log.d("formatter", formatter.format(date))
+    return formatter.format(date)
+}
+
+fun formatTimestampsDouble(timestamps: List<Double>) : List<String> {
+    val formatedTimestamps = mutableListOf<String>()
+    for (timestamp: Double in timestamps) {
+        val formated = formatTimestampDouble(timestamp)
+        if (formated.split(" ")[0].toInt() % 5 == 0) {
+            formatedTimestamps.add(formated)
+        }
+        else {
+            formatedTimestamps.add("")
+        }
+    }
+    return formatedTimestamps
+}
+
+fun formatDateISO8601(date: String): String {
+    val formatter = DateTimeFormatter.ofPattern("dd-MMM-yyyy hh:mm")
+    val localDateTime = Instant.parse(date)
+        .atZone(ZoneId.systemDefault())
+        .toLocalDateTime()
+    return localDateTime.format(formatter)
+}
+

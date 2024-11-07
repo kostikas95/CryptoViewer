@@ -98,6 +98,9 @@ dependencies {
     // constraint layout compose
     implementation(libs.androidx.constraintlayout.compose)
 
+    // compose charts
+    implementation(libs.compose.charts)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

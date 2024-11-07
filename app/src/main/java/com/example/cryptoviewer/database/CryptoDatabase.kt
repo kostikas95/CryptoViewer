@@ -6,7 +6,7 @@ import androidx.room.RoomDatabase
 import com.example.cryptoviewer.model.CryptoCurrency
 import android.content.Context
 
-@Database(entities = [CryptoCurrency::class], version = 3, exportSchema = false)
+@Database(entities = [CryptoCurrency::class], version = 5, exportSchema = false)
 abstract class CryptoDatabase : RoomDatabase() {
 
     abstract fun cryptoDao(): CryptoCurrencyDao
