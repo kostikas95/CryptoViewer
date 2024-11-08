@@ -36,9 +36,7 @@ fun ListItem(
 
     Row(
         modifier = modifier
-            .padding(3.dp)
             .height(72.dp)
-            .border(1.dp, Color.Red)
             .clickable {
                 onListItemClicked(crypto.id)
             },
@@ -47,15 +45,13 @@ fun ListItem(
     ) {
         Text(
             modifier = Modifier.weight(0.7f)
-                .border(1.dp, Color.Green)
                 .padding(5.dp),
             text = crypto.marketCapRank.toString(),
             fontSize = 16.sp,
             textAlign = TextAlign.Center
         )
         Column(
-            modifier = Modifier.weight(0.8f)
-                .border(1.dp, Color.Green),
+            modifier = Modifier.weight(0.8f),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Image(
@@ -73,22 +69,19 @@ fun ListItem(
 
         }
         Text(
-            modifier = Modifier.weight(1.2f)
-                .border(1.dp, Color.Green),
+            modifier = Modifier.weight(1.2f),
             text = "$" + formatNumberForDisplay(crypto.currentPrice, maxLength = 6),
             fontSize = 16.sp,
             textAlign = TextAlign.End
         )
         Text(
-            modifier = Modifier.weight(1.3f)
-                .border(1.dp, Color.Green),
+            modifier = Modifier.weight(1.3f),
             text = String.format(Locale.US, "%.3f", crypto.priceChangePercentage24h) + "%",
             fontSize = 16.sp,
             textAlign = TextAlign.End
         )
         Text(
-            modifier = Modifier.weight(1.3f)
-                .border(1.dp, Color.Green),
+            modifier = Modifier.weight(1.3f),
             text = "$" + formatNumberForDisplay(crypto.marketCap),
             fontSize = 16.sp,
             textAlign = TextAlign.End

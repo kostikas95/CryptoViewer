@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
@@ -50,7 +51,9 @@ fun BottomBar(
     ) {
         routes.forEach { route ->
             val isSelected = currentRoute == route
-            val strokeColor = if (isSelected) Color.Black else Color.Gray
+            val iconColor = if (isSelected) Color.Black else Color.Gray
+            val textColor = if (isSelected) Color(0xFF6B32F5) else Color(0XFFA0A5BA)
+            val fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
             val iconResId : Int
             if (route == "Market") iconResId = R.drawable.ic_market
             else if (route == "Search") iconResId = R.drawable.ic_search
@@ -58,7 +61,7 @@ fun BottomBar(
 
             Column(
                 modifier = Modifier.fillMaxHeight()
-                    .width(50.dp)
+                    .width(80.dp)
                     .clickable {
                         onClick(route)
                     },
@@ -67,13 +70,13 @@ fun BottomBar(
             ) {
                 TabIcon(
                     iconResId = iconResId,
-                    strokeColor = strokeColor
+                    strokeColor = iconColor
                 )
                 Text(
                     text = route,
                     fontSize = 13.sp,
-                    color = if (isSelected) Color.Black else Color.Gray,
-                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                    color = textColor,
+                    fontWeight = fontWeight,
                     textAlign = TextAlign.Center
                 )
             }

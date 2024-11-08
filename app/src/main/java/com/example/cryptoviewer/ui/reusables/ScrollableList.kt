@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DividerDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
@@ -42,15 +45,26 @@ fun ScrollableList(
             modifier = modifier
         )
 
+        HorizontalDivider(
+            modifier = modifier.padding(start = 8.dp, end = 8.dp, top = 3.dp),
+            thickness = 2.dp,
+            color = Color(0xFFA0A5BA)
+        )
+
         LazyColumn(
             state = lazyListState,
-            modifier = Modifier.background(Color.Blue)
+            modifier = Modifier.fillMaxWidth()
         ) {
             items(items = cryptos, key = {it.id}) { crypto ->
                 ListItem(
                     crypto = crypto,
                     modifier = modifier,
                     onListItemClicked = onListItemClicked
+                )
+                HorizontalDivider(
+                    modifier = modifier.padding(horizontal = 8.dp, vertical = 1.dp),
+                    thickness = 1.dp,
+                    color = Color.LightGray
                 )
             }
         }

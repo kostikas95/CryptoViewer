@@ -14,6 +14,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.BottomSheetScaffold
@@ -34,11 +35,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -56,6 +60,7 @@ import com.example.cryptoviewer.ui.reusables.AutoScrollToTopFAB
 import com.example.cryptoviewer.ui.reusables.BottomBar
 import com.example.cryptoviewer.ui.reusables.CustomBottomSheet
 import com.example.cryptoviewer.ui.reusables.ScrollableList
+import com.example.cryptoviewer.ui.reusables.TopBar
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -79,7 +84,7 @@ fun SearchScreen(
     val expandedSheetHeight = LocalConfiguration.current.screenHeightDp.dp * 0.8f
     val isFabVisible by viewModel.isFabVisible.collectAsState()
     var isBottomBarVisible by remember { mutableStateOf(true) }
-    var topBarHeight by remember { mutableStateOf(150.dp) }
+    var topBarHeight by remember { mutableStateOf(100.dp) }
     val favouriteIds by viewModel.favouriteIds.collectAsState()
     val lazyListState = viewModel.lazyListState
     val scope = rememberCoroutineScope()
@@ -158,10 +163,10 @@ fun SearchScreen(
                 }
 
                 if (currentIndex == 0) {
-                    topBarHeight = 150.dp
+                    topBarHeight = 100.dp
                 } else if (currentIndex in 1..2) {
                     val shrinkFactor = currentIndex / 2f
-                    topBarHeight = lerp(150.dp, 65.dp, shrinkFactor)
+                    topBarHeight = lerp(100.dp, 65.dp, shrinkFactor)
                 } else {
                     topBarHeight = 65.dp
                 }
@@ -204,14 +209,16 @@ fun SearchScreen(
 
                 Box {
                     Content(
-                        innerPadding = PaddingValues(0.dp),
                         searchText = searchText,
                         lazyListState = lazyListState,
                         cryptos = cryptos,
                         onSortingFactorTextClick = onSortingFactorTextClick,
                         onSearchTextChanged = onSearchTextChanged,
                         onListItemClicked = onListItemClicked,
-                        onLoadNextPage = onLoadNextPage
+                        onLoadNextPage = onLoadNextPage,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 8.dp)
                     )
 
                     // FAB
@@ -269,53 +276,47 @@ fun SearchScreen(
     }
 }
 
-@Composable
-fun TopBar(
-    title: String,
-    animatedHeight: Dp
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxWidth()
-            .height(animatedHeight)
-            .background(Color.Red)
-            .padding(top = 32.dp, start = 16.dp, end = 16.dp)
-
-    ) {
-        Text(
-            text = title,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Image(
-            painter = painterResource(R.drawable.top_app_bar_image),
-            contentDescription = "topAppBarImage"
-        )
-    }
-}
 
 @Composable
 fun Content(
-    innerPadding: PaddingValues,
     searchText: String,
     lazyListState: LazyListState,
     cryptos: List<CryptoCurrency>,
     onSortingFactorTextClick: (SortField) -> Unit,
     onSearchTextChanged: (String) -> Unit,
     onListItemClicked: (String) -> Unit,
-    onLoadNextPage: () -> Unit
+    onLoadNextPage: () -> Unit,
+    modifier: Modifier
 ) {
     Column(
-        modifier = Modifier.fillMaxSize()
-            .padding(innerPadding)
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         TextField(
+            modifier = Modifier
+                .width(330.dp)
+                .padding(vertical = 8.dp),
             value = searchText,
             onValueChange = { newText ->
-                onSearchTextChanged(newText)
-            },
-            label = { Text("Search name or id") }
+                onSearchTextChanged(newText) },
+            label = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Search by name or id...",
+                        color = Color(0xFFA0A5BA)
+                    )
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_search),
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(Color(0xFFA0A5BA)),
+                        // modifier = Modifier.size(32.dp)
+                    )
+                }
+            }
         )
 
         ScrollableList(
@@ -324,7 +325,8 @@ fun Content(
             onSortingFactorTextClick = onSortingFactorTextClick,
             onListItemClicked = onListItemClicked,
             onLoadNextPage = onLoadNextPage,
-            modifier = Modifier.fillMaxWidth().padding(start = 8.dp, end = 8.dp)
+            modifier = Modifier
+                .fillMaxWidth()
         )
     }
 }

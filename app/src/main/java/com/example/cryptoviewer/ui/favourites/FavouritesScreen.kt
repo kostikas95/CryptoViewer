@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -40,7 +41,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -57,6 +60,7 @@ import com.example.cryptoviewer.ui.reusables.AutoScrollToTopFAB
 import com.example.cryptoviewer.ui.reusables.BottomBar
 import com.example.cryptoviewer.ui.reusables.CustomBottomSheet
 import com.example.cryptoviewer.ui.reusables.ScrollableList
+import com.example.cryptoviewer.ui.reusables.TopBar
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -79,7 +83,7 @@ fun FavouritesScreen(
     val expandedSheetHeight = LocalConfiguration.current.screenHeightDp.dp * 0.8f
     val isFabVisible by viewModel.isFabVisible.collectAsState()
     var isBottomBarVisible by remember { mutableStateOf(true) }
-    var topBarHeight by remember { mutableStateOf(150.dp) }
+    var topBarHeight by remember { mutableStateOf(100.dp) }
     val favouriteIds by viewModel.favouriteIds.collectAsState()
     val lazyListState = viewModel.lazyListState
     val scope = rememberCoroutineScope()
@@ -152,10 +156,10 @@ fun FavouritesScreen(
                 }
 
                 if (currentIndex == 0) {
-                    topBarHeight = 150.dp
+                    topBarHeight = 100.dp
                 } else if (currentIndex in 1..2) {
                     val shrinkFactor = currentIndex / 2f
-                    topBarHeight = lerp(150.dp, 65.dp, shrinkFactor)
+                    topBarHeight = lerp(100.dp, 65.dp, shrinkFactor)
                 } else {
                     topBarHeight = 65.dp
                 }
@@ -202,7 +206,9 @@ fun FavouritesScreen(
                         cryptos = cryptos,
                         onSortingFactorTextClick = onSortingFactorTextClick,
                         onListItemClicked = onListItemClicked,
-                        modifier = Modifier.fillMaxWidth().padding(start = 8.dp, end = 8.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp)
                     )
 
                     // FAB
@@ -259,28 +265,3 @@ fun FavouritesScreen(
 }
 
 
-@Composable
-fun TopBar(
-    title: String,
-    animatedHeight: Dp
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxWidth()
-            .height(animatedHeight)
-            .background(Color.Red)
-            .padding(top = 32.dp, start = 16.dp, end = 16.dp)
-
-    ) {
-        Text(
-            text = title,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Image(
-            painter = painterResource(R.drawable.top_app_bar_image),
-            contentDescription = "topAppBarImage"
-        )
-    }
-}
